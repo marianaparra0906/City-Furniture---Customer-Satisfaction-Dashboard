@@ -82,26 +82,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .nav-item {
-        padding: 0.5rem;
-        margin: 0.2rem 0;
-        border-radius: 6px;
-        font-weight: 500;
-        color: #4a5568;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .nav-item:hover {
-        background: #e2e8f0;
-        color: #2d3748;
-    }
-
-    .nav-item.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
     /* Tab Styling */
     .stTabs > div > div > div > div {
         background: white;
@@ -213,16 +193,7 @@ st.markdown("""
         margin: 1.5rem 0 1rem 0;
     }
 
-    /* Charts and Plots */
-    .plot-container {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin: 1rem 0;
-    }
-
-    /* Filter Controls */
+    /* Filter and Chart Containers */
     .filter-container {
         background: white;
         border-radius: 12px;
@@ -231,15 +202,15 @@ st.markdown("""
         margin: 1rem 0;
     }
 
-    /* Alert Messages */
-    .alert-success {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        border: 1px solid #10b981;
-        border-radius: 8px;
+    .plot-container {
+        background: white;
+        border-radius: 12px;
         padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         margin: 1rem 0;
     }
 
+    /* Alert Messages */
     .alert-warning {
         background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
         border: 1px solid #f59e0b;
@@ -298,25 +269,6 @@ st.markdown("""
         .main-header h1 { font-size: 1.8rem; }
         .metric-card { margin: 0.25rem 0; padding: 1rem; }
         .metric-card h1 { font-size: 1.8rem; }
-    }
-
-    /* Custom Scrollbar */
-    .sidebar .sidebar-content::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 3px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -539,10 +491,7 @@ with tab1:
             line_color="#10b981",
             line_width=2,
             annotation_text="🎯 Target (9.0)",
-            annotation_position="bottom right",
-            annotation=dict(
-                font=dict(color="#10b981", size=12, family="Inter")
-            )
+            annotation_position="bottom right"
         )
 
     # Highlight weekends with modern markers
@@ -563,11 +512,7 @@ with tab1:
 
     # Modern chart layout
     fig_timeline.update_layout(
-        title=dict(
-            text="📊 Daily Customer Satisfaction Evolution",
-            font=dict(size=18, family="Inter", color="#1a202c"),
-            x=0.02
-        ),
+        title="📊 Daily Customer Satisfaction Evolution",
         xaxis_title="📅 Date",
         yaxis_title="⭐ Satisfaction Score",
         font=dict(family="Inter"),
@@ -586,14 +531,8 @@ with tab1:
         ),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(
-            gridcolor='#f1f5f9',
-            gridwidth=1
-        ),
-        yaxis=dict(
-            gridcolor='#f1f5f9',
-            gridwidth=1
-        )
+        xaxis=dict(gridcolor='#f1f5f9', gridwidth=1),
+        yaxis=dict(gridcolor='#f1f5f9', gridwidth=1)
     )
 
     st.plotly_chart(fig_timeline, use_container_width=True)
@@ -808,7 +747,6 @@ with tab2:
                 comparison_data,
                 x='month',
                 y='average_score',
-                title=f"📊 {selected_metric} - Monthly Performance",
                 color='classification',
                 color_discrete_map={
                     'Excellent': '#10b981',
@@ -830,35 +768,18 @@ with tab2:
 
             fig_bar_enhanced.update_traces(
                 texttemplate='%{text:.2f}', 
-                textposition='outside',
-                textfont=dict(color="#1a202c", family="Inter", size=12)
+                textposition='outside'
             )
 
             fig_bar_enhanced.update_layout(
+                title=f"📊 {selected_metric} - Monthly Performance",
                 font=dict(family="Inter"),
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 height=450,
                 showlegend=True,
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=-0.2,
-                    xanchor="center",
-                    x=0.5
-                ),
-                title=dict(
-                    font=dict(size=14, color="#1a202c"),
-                    x=0.02
-                ),
-                xaxis=dict(
-                    title="📅 Period",
-                    gridcolor='#f1f5f9'
-                ),
-                yaxis=dict(
-                    title="⭐ Average Score",
-                    gridcolor='#f1f5f9'
-                )
+                xaxis=dict(title="📅 Period", gridcolor='#f1f5f9'),
+                yaxis=dict(title="⭐ Average Score", gridcolor='#f1f5f9')
             )
 
             st.plotly_chart(fig_bar_enhanced, use_container_width=True)
@@ -872,7 +793,6 @@ with tab2:
                 comparison_data,
                 x='month',
                 y='performance_vs_target',
-                title=f"🎯 Performance Gap Analysis - {selected_metric}",
                 color='performance_vs_target',
                 color_continuous_scale='RdYlGn',
                 text='performance_vs_target'
@@ -882,34 +802,24 @@ with tab2:
 
             fig_performance.update_traces(
                 texttemplate='%{text:+.2f}', 
-                textposition='outside',
-                textfont=dict(color="#1a202c", family="Inter", size=12)
+                textposition='outside'
             )
 
             fig_performance.update_layout(
+                title=f"🎯 Performance Gap Analysis - {selected_metric}",
                 font=dict(family="Inter"),
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 height=450,
-                title=dict(
-                    font=dict(size=14, color="#1a202c"),
-                    x=0.02
-                ),
-                xaxis=dict(
-                    title="📅 Period",
-                    gridcolor='#f1f5f9'
-                ),
-                yaxis=dict(
-                    title="📈 Difference from Target",
-                    gridcolor='#f1f5f9'
-                )
+                xaxis=dict(title="📅 Period", gridcolor='#f1f5f9'),
+                yaxis=dict(title="📈 Difference from Target", gridcolor='#f1f5f9')
             )
 
             st.plotly_chart(fig_performance, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
         # Enhanced Performance Summary
-        st.markdown('<h3 class="subsection-header">📋 Detailed Performance Insights</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 class="subsection-header">📋 Performance Summary</h3>', unsafe_allow_html=True)
 
         summary_cols = st.columns(4)
 
@@ -954,39 +864,6 @@ with tab2:
                 <h3>📉 Avg % Below Target</h3>
                 <h1>{avg_days_below_pct:.1f}%</h1>
                 <p>Average across periods</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Trend Analysis
-        if len(comparison_data) > 1:
-            st.markdown('<h3 class="subsection-header">📈 Trend Analysis</h3>', unsafe_allow_html=True)
-
-            # Trend direction analysis
-            first_score = comparison_data.iloc[0]['average_score']
-            last_score = comparison_data.iloc[-1]['average_score']
-            trend_direction = last_score - first_score
-
-            if trend_direction > 0.1:
-                trend_emoji = "📈"
-                trend_text = "Improving"
-                trend_color = "#10b981"
-            elif trend_direction < -0.1:
-                trend_emoji = "📉"
-                trend_text = "Declining"
-                trend_color = "#ef4444"
-            else:
-                trend_emoji = "➡️"
-                trend_text = "Stable"
-                trend_color = "#667eea"
-
-            st.markdown(f"""
-            <div style="background: white; padding: 2rem; border-radius: 12px; 
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">{trend_emoji}</div>
-                <h3 style="color: {trend_color}; margin: 0;">Overall Trend: {trend_text}</h3>
-                <p style="color: #64748b; margin: 0.5rem 0 0 0;">
-                    Change from first to last period: <strong style="color: {trend_color};">{trend_direction:+.2f} points</strong>
-                </p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1171,57 +1048,6 @@ with tab3:
             </div>
             """, unsafe_allow_html=True)
 
-        # Enhanced Visualization
-        st.markdown('<h3 class="subsection-header">📈 Events Impact Visualization</h3>', unsafe_allow_html=True)
-
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-        fig_events = px.scatter(
-            sorted_events,
-            x='date',
-            y='failure_percentage',
-            color='severity',
-            size='failure_percentage',
-            hover_data=['day_of_week', 'failed_metrics', 'promotion'],
-            title="🚨 Event Risk Analysis Over Time",
-            color_discrete_map={
-                'Critical': '#dc2626',
-                'High': '#f59e0b', 
-                'Medium': '#3b82f6',
-                'Low': '#10b981'
-            }
-        )
-
-        # Add risk threshold lines
-        fig_events.add_hline(y=75, line_dash="dash", line_color="#dc2626", line_width=2,
-                           annotation_text="🚨 Critical Risk (75%+)")
-        fig_events.add_hline(y=50, line_dash="dash", line_color="#f59e0b", line_width=2,
-                           annotation_text="⚠️ High Risk (50%+)")
-        fig_events.add_hline(y=25, line_dash="dash", line_color="#3b82f6", line_width=2,
-                           annotation_text="🟡 Medium Risk (25%+)")
-
-        fig_events.update_layout(
-            font=dict(family="Inter"),
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            height=500,
-            showlegend=True,
-            title=dict(
-                font=dict(size=16, color="#1a202c"),
-                x=0.02
-            ),
-            xaxis=dict(
-                title="📅 Date",
-                gridcolor='#f1f5f9'
-            ),
-            yaxis=dict(
-                title="📊 Failure Percentage (%)",
-                gridcolor='#f1f5f9'
-            )
-        )
-
-        st.plotly_chart(fig_events, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
     else:
         st.markdown("""
         <div class="alert-warning">
@@ -1381,7 +1207,7 @@ with tab4:
     with col1:
         st.markdown('<div class="plot-container">', unsafe_allow_html=True)
 
-        # Performance trend chart
+        # Performance trend chart (FIXED - removed duplicate title)
         trend_df = pd.DataFrame({
             'Month': months,
             'Score': monthly_scores,
@@ -1407,24 +1233,15 @@ with tab4:
             line=dict(color='#10b981', width=2, dash='dash')
         ))
 
+        # FIXED: Only one title parameter
         fig_trend.update_layout(
             title=f"📊 {selected_risk_metric} - Performance Trend",
             font=dict(family="Inter"),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             height=400,
-            title=dict(
-                font=dict(size=14, color="#1a202c"),
-                x=0.02
-            ),
-            xaxis=dict(
-                title="📅 Month",
-                gridcolor='#f1f5f9'
-            ),
-            yaxis=dict(
-                title="⭐ Score",
-                gridcolor='#f1f5f9'
-            )
+            xaxis=dict(title="📅 Month", gridcolor='#f1f5f9'),
+            yaxis=dict(title="⭐ Score", gridcolor='#f1f5f9')
         )
 
         st.plotly_chart(fig_trend, use_container_width=True)
@@ -1433,7 +1250,7 @@ with tab4:
     with col2:
         st.markdown('<div class="plot-container">', unsafe_allow_html=True)
 
-        # Risk gap analysis
+        # Risk gap analysis (FIXED - removed duplicate title)
         gap_df = pd.DataFrame({
             'Month': months,
             'Gap': performance_gaps,
@@ -1445,7 +1262,6 @@ with tab4:
             x='Month',
             y='Gap',
             color='Risk_Level',
-            title=f"🎯 Performance Gap Analysis - {selected_risk_metric}",
             color_discrete_map={
                 'High Risk': '#ef4444',
                 'Medium Risk': '#f59e0b',
@@ -1455,23 +1271,15 @@ with tab4:
 
         fig_gaps.add_hline(y=0, line_dash="solid", line_color="#64748b", line_width=1)
 
+        # FIXED: Only one title parameter
         fig_gaps.update_layout(
+            title=f"🎯 Performance Gap Analysis - {selected_risk_metric}",
             font=dict(family="Inter"),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             height=400,
-            title=dict(
-                font=dict(size=14, color="#1a202c"),
-                x=0.02
-            ),
-            xaxis=dict(
-                title="📅 Month",
-                gridcolor='#f1f5f9'
-            ),
-            yaxis=dict(
-                title="📊 Gap from Target",
-                gridcolor='#f1f5f9'
-            )
+            xaxis=dict(title="📅 Month", gridcolor='#f1f5f9'),
+            yaxis=dict(title="📊 Gap from Target", gridcolor='#f1f5f9')
         )
 
         st.plotly_chart(fig_gaps, use_container_width=True)
@@ -1492,10 +1300,10 @@ with tab4:
 
             <h4 style="color: #ef4444; margin: 1.5rem 0 0.5rem 0;">⚠️ Key Risk Factors:</h4>
             <ul style="margin: 0; padding-left: 1.2rem;">
-        """)
+        """, unsafe_allow_html=True)
 
         for factor in metric_info['risk_factors']:
-            st.markdown(f"<li style='margin: 0.3rem 0;'>{factor}</li>")
+            st.markdown(f"<li style='margin: 0.3rem 0;'>{factor}</li>", unsafe_allow_html=True)
 
         st.markdown("</ul></div>", unsafe_allow_html=True)
 
@@ -1504,10 +1312,10 @@ with tab4:
         <div class="metric-card status-excellent">
             <h3>💡 Strategic Recommendations</h3>
             <ol style="margin: 1rem 0; padding-left: 1.2rem;">
-        """)
+        """, unsafe_allow_html=True)
 
         for rec in metric_info['recommendations']:
-            st.markdown(f"<li style='margin: 0.5rem 0;'>{rec}</li>")
+            st.markdown(f"<li style='margin: 0.5rem 0;'>{rec}</li>", unsafe_allow_html=True)
 
         # Performance prediction
         if trend_direction > 0.1:
