@@ -7,474 +7,45 @@ import numpy as np
 from datetime import datetime, timedelta
 import io
 
-# Configure page with modern settings
+# Configure page
 st.set_page_config(
-    page_title="City Furniture - Analytics Dashboard",
-    page_icon="🏢",
+    page_title="Customer Satisfaction Dashboard",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Modern CSS styling - Integration of advanced functionality with beautiful design
+# Custom CSS for responsive design
 st.markdown("""
 <style>
-    /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-    /* Global Styling */
-    .main {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-    }
-
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-
-    /* Main Header with modern gradient */
     .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 2.5rem;
-        border-radius: 20px;
-        margin-bottom: 2rem;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-        backdrop-filter: blur(10px);
-    }
-
-    .main-header h1 {
-        color: white;
         font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        letter-spacing: -0.5px;
-    }
-
-    .main-header p {
-        color: rgba(255,255,255,0.95);
-        font-size: 1.2rem;
-        margin: 1rem 0 0 0;
-        font-weight: 400;
-    }
-
-    /* Advanced Sidebar Styling */
-    .sidebar .sidebar-content {
-        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 0.5rem;
-    }
-
-    .nav-header {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #1a202c;
-        margin: 1.5rem 0 1rem 0;
-        padding: 1rem;
-        background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        font-weight: bold;
+        color: #1f77b4;
         text-align: center;
-        border-left: 4px solid #667eea;
-    }
-
-    .nav-section {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        border: 1px solid #e2e8f0;
-    }
-
-    /* Enhanced Tab Styling */
-    .stTabs > div > div > div > div {
-        background: white;
-        border-radius: 16px;
-        padding: 0;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
         margin-bottom: 2rem;
-        border: 1px solid #e2e8f0;
     }
 
-    .stTabs > div > div > div > div > div {
-        border: none;
-        border-radius: 16px 16px 0 0;
-        background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
-        padding: 0.5rem;
-    }
-
-    .stTabs > div > div > div > div > div > button {
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        border: none;
-        border-radius: 12px;
-        margin: 0.25rem;
-        padding: 1rem 2rem;
-        background: white;
-        color: #4a5568;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.95rem;
-    }
-
-    .stTabs > div > div > div > div > div > button[aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .stTabs > div > div > div > div > div > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    }
-
-    /* Advanced Metric Cards */
     .metric-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-        border-left: 5px solid #667eea;
-        margin: 1rem 0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid #e2e8f0;
-        position: relative;
-        overflow: hidden;
+        background: linear-gradient(90deg, #f0f2f6, #ffffff);
+        padding: 1rem;
+        border-radius: 10px;
+        border-left: 4px solid #1f77b4;
+        margin: 0.5rem 0;
     }
 
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
+    .risk-high { border-left-color: #ff4444 !important; }
+    .risk-medium { border-left-color: #ffaa00 !important; }
+    .risk-low { border-left-color: #00aa00 !important; }
 
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 16px 48px rgba(0,0,0,0.12);
-        border-color: #667eea;
-    }
-
-    .metric-card h3 {
-        color: #2d3748;
-        font-weight: 700;
-        margin: 0 0 0.8rem 0;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        opacity: 0.8;
-    }
-
-    .metric-card h1 {
-        color: #1a202c;
-        font-weight: 800;
-        margin: 0;
-        font-size: 2.8rem;
-        line-height: 1;
-    }
-
-    .metric-card p {
-        color: #718096;
-        margin: 1rem 0 0 0;
-        font-size: 0.95rem;
-        font-weight: 500;
-    }
-
-    /* Enhanced Status Cards */
-    .status-excellent {
-        border-left-color: #10b981 !important;
-        background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%) !important;
-    }
-
-    .status-excellent::before {
-        background: linear-gradient(90deg, #10b981 0%, #059669 100%) !important;
-    }
-
-    .status-good {
-        border-left-color: #f59e0b !important;
-        background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%) !important;
-    }
-
-    .status-good::before {
-        background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important;
-    }
-
-    .status-needs-improvement {
-        border-left-color: #ef4444 !important;
-        background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%) !important;
-    }
-
-    .status-needs-improvement::before {
-        background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%) !important;
-    }
-
-    .status-critical {
-        border-left-color: #dc2626 !important;
-        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
-        animation: pulse-critical 2s ease-in-out infinite;
-    }
-
-    .status-critical::before {
-        background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%) !important;
-    }
-
-    @keyframes pulse-critical {
-        0%, 100% { box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2); }
-        50% { box-shadow: 0 8px 32px rgba(220, 38, 38, 0.4); }
-    }
-
-    /* Modern Section Headers */
-    .section-header {
-        color: #1a202c;
-        font-weight: 700;
-        font-size: 1.8rem;
-        margin: 3rem 0 1.5rem 0;
-        padding: 1.5rem 0;
-        border-bottom: 3px solid #e2e8f0;
-        position: relative;
-    }
-
-    .section-header::after {
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        border-radius: 2px;
-    }
-
-    .subsection-header {
-        color: #2d3748;
-        font-weight: 600;
-        font-size: 1.3rem;
-        margin: 2rem 0 1.5rem 0;
-        padding-left: 1rem;
-        border-left: 4px solid #667eea;
-    }
-
-    /* Enhanced Containers */
-    .filter-container {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-        margin: 1.5rem 0;
-        border: 1px solid #e2e8f0;
-    }
-
-    .plot-container {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-        margin: 1.5rem 0;
-        border: 1px solid #e2e8f0;
-    }
-
-    /* Advanced Alert Messages */
-    .alert-warning {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
-    }
-
-    .alert-success {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        border: 2px solid #10b981;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
-    }
-
-    .alert-error {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        border: 2px solid #ef4444;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
-    }
-
-    /* Premium Priority Cards */
-    .priority-critical {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        border: 2px solid #dc2626;
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 8px 32px rgba(220, 38, 38, 0.15);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .priority-critical::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
-    }
-
-    .priority-high {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 8px 32px rgba(245, 158, 11, 0.15);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .priority-high::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
-    }
-
-    .priority-medium {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        border: 2px solid #3b82f6;
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .priority-medium::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-    }
-
-    .priority-low {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        border: 2px solid #10b981;
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .priority-low::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-    }
-
-    /* Modern Buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.8rem 1.5rem;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
-    }
-
-    /* Modern Selectboxes and Inputs */
-    .stSelectbox > div > div {
-        background: white;
-        border-radius: 12px;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .stSelectbox > div > div:focus-within {
-        border-color: #667eea;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
-    }
-
-    /* Responsive Design */
     @media (max-width: 768px) {
-        .main-header h1 { font-size: 2rem; }
-        .main-header p { font-size: 1rem; }
-        .metric-card { margin: 0.5rem 0; padding: 1.5rem; }
-        .metric-card h1 { font-size: 2.2rem; }
-        .section-header { font-size: 1.5rem; }
-    }
-
-    /* Advanced animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .fadeInUp {
-        animation: fadeInUp 0.6s ease-out;
-    }
-
-    /* Custom scrollbar */
-    .sidebar .sidebar-content::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 4px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
-        border-radius: 4px;
-    }
-
-    .sidebar .sidebar-content::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+        .main-header { font-size: 1.8rem; }
+        .metric-card { margin: 0.25rem 0; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state for navigation
-if 'current_section' not in st.session_state:
-    st.session_state.current_section = "overview"
-
-# Enhanced data loading function from original code with modern integration
+# Generate sample data for the dashboard
 @st.cache_data
 def load_data():
     # Daily satisfaction scores from May 30 to Sept 30, 2025
@@ -526,15 +97,22 @@ def load_data():
 
     # Enhanced events data with more comprehensive information
     enhanced_events_data = [
+        # Critical Events
         {'date': datetime(2025, 8, 11), 'day_of_week': 'Tuesday', 'failed_metrics': '7/8', 'failure_percentage': 87.5, 'promotion': 'Without promo', 'severity': 'Critical'},
         {'date': datetime(2025, 8, 13), 'day_of_week': 'Saturday', 'failed_metrics': '6/8', 'failure_percentage': 75.0, 'promotion': 'No promotion', 'severity': 'High'},
         {'date': datetime(2025, 6, 29), 'day_of_week': 'Monday', 'failed_metrics': '6/8', 'failure_percentage': 75.0, 'promotion': '4th of July Event 7% OFF', 'severity': 'High'},
         {'date': datetime(2025, 8, 7), 'day_of_week': 'Sunday', 'failed_metrics': '4/8', 'failure_percentage': 50.0, 'promotion': 'No promotion', 'severity': 'Medium'},
         {'date': datetime(2025, 8, 25), 'day_of_week': 'Thursday', 'failed_metrics': '4/8', 'failure_percentage': 50.0, 'promotion': 'Without promo', 'severity': 'Medium'},
         {'date': datetime(2025, 9, 22), 'day_of_week': 'Tuesday', 'failed_metrics': '4/8', 'failure_percentage': 50.0, 'promotion': 'Without promo', 'severity': 'Medium'},
+
+        # Additional Events (Non-Critical)
         {'date': datetime(2025, 7, 14), 'day_of_week': 'Tuesday', 'failed_metrics': '3/8', 'failure_percentage': 37.5, 'promotion': 'Anniversary Sale Kick Off', 'severity': 'Low'},
         {'date': datetime(2025, 7, 8), 'day_of_week': 'Wednesday', 'failed_metrics': '3/8', 'failure_percentage': 37.5, 'promotion': 'No promotion', 'severity': 'Low'},
         {'date': datetime(2025, 8, 2), 'day_of_week': 'Sunday', 'failed_metrics': '3/8', 'failure_percentage': 37.5, 'promotion': 'No promotion', 'severity': 'Low'},
+        {'date': datetime(2025, 8, 13), 'day_of_week': 'Thursday', 'failed_metrics': '3/8', 'failure_percentage': 37.5, 'promotion': 'No promotion', 'severity': 'Low'},
+        {'date': datetime(2025, 8, 18), 'day_of_week': 'Monday', 'failed_metrics': '3/8', 'failure_percentage': 37.5, 'promotion': 'No promotion', 'severity': 'Low'},
+
+        # Good Performance Events (for context)
         {'date': datetime(2025, 6, 15), 'day_of_week': 'Monday', 'failed_metrics': '2/8', 'failure_percentage': 25.0, 'promotion': 'Father Day Special 15% OFF', 'severity': 'Low'},
         {'date': datetime(2025, 9, 1), 'day_of_week': 'Tuesday', 'failed_metrics': '2/8', 'failure_percentage': 25.0, 'promotion': 'Labor Day Sale', 'severity': 'Low'},
         {'date': datetime(2025, 7, 20), 'day_of_week': 'Monday', 'failed_metrics': '1/8', 'failure_percentage': 12.5, 'promotion': 'Summer Clearance 20% OFF', 'severity': 'Low'},
@@ -549,573 +127,178 @@ def load_data():
 # Load data
 daily_df, events_df = load_data()
 
-# Enhanced Sidebar with modern design
-def create_enhanced_sidebar():
-    with st.sidebar:
-        # Modern company header
-        st.markdown("""
-        <div class="nav-header">
-            🏢 City Furniture<br>
-            <span style="font-size: 0.9rem; font-weight: 400; opacity: 0.8;">Analytics Intelligence Hub</span>
-        </div>
-        """, unsafe_allow_html=True)
+# Sidebar
+st.sidebar.markdown("### 📊 Dashboard Navigation")
+st.sidebar.markdown("---")
 
-        # Navigation sections
-        st.markdown('<div class="nav-section">', unsafe_allow_html=True)
-        st.markdown("**🎯 Dashboard Control Center**")
+# Main header
+st.markdown('<h1 class="main-header">City Furniture - Interactive Customer Satisfaction Analysis</h1>', 
+           unsafe_allow_html=True)
+st.markdown("**May 30, 2025 to September 30, 2025** | (124 days analyzed)")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("📊 Overview", key="nav_overview_main", use_container_width=True):
-                st.session_state.current_section = "overview"
-                st.success("📊 Overview activated!")
+# Create tabs
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Daily Timeline", "📊 Monthly Comparison", "⚠️ Critical Events", "🎯 Risk Analysis"])
 
-        with col2:
-            if st.button("🎯 Metrics", key="nav_metrics_main", use_container_width=True):
-                st.session_state.current_section = "metrics"
-                st.success("🎯 Metrics panel opened!")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Advanced analytics navigation
-        st.markdown('<div class="nav-section">', unsafe_allow_html=True)
-        st.markdown("**📈 Advanced Analytics**")
-
-        if st.button("📈 Performance Trends", key="nav_trends", use_container_width=True):
-            st.success("📈 Performance trends analysis ready!")
-        if st.button("🔍 Deep Dive Analysis", key="nav_deep_dive", use_container_width=True):
-            st.success("🔍 Deep dive analysis activated!")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Quick actions
-        st.markdown('<div class="nav-section">', unsafe_allow_html=True)
-        st.markdown("**🔧 Quick Actions**")
-
-        if st.button("📊 Generate Report", key="nav_generate_report", use_container_width=True):
-            st.success("📊 Report generation initiated!")
-        if st.button("🔄 Refresh All", key="nav_refresh_all", use_container_width=True):
-            st.cache_data.clear()
-            st.success("🔄 All data refreshed!")
-            st.rerun()
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Enhanced quick stats
-        st.markdown('<div class="nav-section">', unsafe_allow_html=True)
-        st.markdown("**📊 Live Statistics**")
-
-        # Calculate advanced statistics
-        avg_score = daily_df['satisfaction_score'].mean()
-        below_target = (daily_df['satisfaction_score'] < 9.0).sum()
-        total_days = len(daily_df)
-        performance_rate = ((total_days - below_target) / total_days * 100)
-
-        # Recent trend analysis
-        recent_scores = daily_df.tail(7)['satisfaction_score'].mean()
-        previous_scores = daily_df.iloc[-14:-7]['satisfaction_score'].mean()
-        trend = recent_scores - previous_scores
-
-        # Critical events count
-        critical_events = len(events_df[events_df['severity'] == 'Critical'])
-        high_events = len(events_df[events_df['severity'] == 'High'])
-
-        # Enhanced stat cards with gradients
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    color: white; padding: 1.2rem; border-radius: 12px; margin: 0.5rem 0; 
-                    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);">
-            <div style="font-weight: 700; font-size: 0.85rem; opacity: 0.9;">OVERALL SCORE</div>
-            <div style="font-size: 2rem; font-weight: 800; margin: 0.2rem 0;">{avg_score:.1f}</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">out of 10.0 points</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                    color: white; padding: 1.2rem; border-radius: 12px; margin: 0.5rem 0;
-                    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);">
-            <div style="font-weight: 700; font-size: 0.85rem; opacity: 0.9;">PERFORMANCE RATE</div>
-            <div style="font-size: 2rem; font-weight: 800; margin: 0.2rem 0;">{performance_rate:.1f}%</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">days meeting target</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        trend_color = "#10b981" if trend >= 0 else "#ef4444"
-        trend_icon = "📈" if trend >= 0 else "📉"
-
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, {trend_color} 0%, {trend_color}dd 100%); 
-                    color: white; padding: 1.2rem; border-radius: 12px; margin: 0.5rem 0;
-                    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);">
-            <div style="font-weight: 700; font-size: 0.85rem; opacity: 0.9;">WEEKLY TREND {trend_icon}</div>
-            <div style="font-size: 2rem; font-weight: 800; margin: 0.2rem 0;">{trend:+.2f}</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">7-day comparison</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
-                    color: white; padding: 1.2rem; border-radius: 12px; margin: 0.5rem 0;
-                    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);">
-            <div style="font-weight: 700; font-size: 0.85rem; opacity: 0.9;">CRITICAL ALERTS 🚨</div>
-            <div style="font-size: 2rem; font-weight: 800; margin: 0.2rem 0;">{critical_events + high_events}</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">high priority events</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# Create enhanced sidebar
-create_enhanced_sidebar()
-
-# Modern main header with advanced information
-st.markdown("""
-<div class="main-header fadeInUp">
-    <h1>🏢 City Furniture - Customer Satisfaction Analytics</h1>
-    <p>May 30, 2025 - September 30, 2025 | 124 days analyzed | Advanced Business Intelligence Platform</p>
-    <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap;">
-        <div style="background: rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="font-weight: 600;">📊 Real-time Analytics</span>
-        </div>
-        <div style="background: rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="font-weight: 600;">🤖 AI-Powered Insights</span>
-        </div>
-        <div style="background: rgba(255,255,255,0.2); padding: 0.8rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="font-weight: 600;">⚡ Live Monitoring</span>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Create enhanced tabs with advanced functionality
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📈 Daily Timeline", 
-    "📊 Monthly Comparison", 
-    "⚠️ Critical Events", 
-    "🎯 Risk Analysis"
-])
-
-# TAB 1: Daily Timeline with Enhanced Functionality from Original Code
+# TAB 1: Daily Timeline
 with tab1:
-    st.markdown('<h2 class="section-header fadeInUp">📈 Daily Performance Timeline</h2>', unsafe_allow_html=True)
+    st.header("Daily Satisfaction Timeline")
 
-    # Advanced filter container with modern design
-    st.markdown('<div class="filter-container">', unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns(4)
-
+    # Filters
+    col1, col2, col3 = st.columns(3)
     with col1:
         month_filter = st.selectbox(
-            "🗓️ Filter by Month:",
+            "Filter by Month:",
             options=["All Months"] + sorted(daily_df['month'].unique()),
-            key="daily_month_filter_advanced",
-            help="Select a specific month for detailed analysis"
+            key="daily_month_filter"
         )
 
     with col2:
-        show_weekends = st.checkbox(
-            "🔸 Highlight Weekends", 
-            value=True, 
-            key="show_weekends_advanced",
-            help="Show weekend performance with special markers"
-        )
+        show_weekends = st.checkbox("Highlight Weekends", value=True)
 
     with col3:
-        show_target = st.checkbox(
-            "🎯 Show Target Line", 
-            value=True, 
-            key="show_target_advanced",
-            help="Display performance target reference line at 9.0"
-        )
+        show_target = st.checkbox("Show Target Line (9.0)", value=True)
 
-    with col4:
-        show_trends = st.checkbox(
-            "📊 Show Trend Analysis", 
-            value=False, 
-            key="show_trends_advanced",
-            help="Display trend lines and moving averages"
-        )
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Apply filters
+    # Filter data based on selection
     filtered_daily = daily_df.copy()
     if month_filter != "All Months":
         filtered_daily = daily_df[daily_df['month'] == month_filter]
 
-    if len(filtered_daily) == 0:
-        st.markdown("""
-        <div class="alert-warning">
-            <h4>❌ No data available</h4>
-            <p>No data found for the selected month. Please choose a different filter.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        # Enhanced timeline chart with advanced features
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+    # Create timeline chart
+    fig_timeline = go.Figure()
 
-        # Create advanced figure with subplots if trends are enabled
-        if show_trends:
-            fig = make_subplots(
-                rows=2, cols=1,
-                subplot_titles=('Daily Satisfaction Scores', 'Trend Analysis'),
-                vertical_spacing=0.12,
-                row_heights=[0.7, 0.3]
-            )
+    # Main satisfaction line
+    fig_timeline.add_trace(go.Scatter(
+        x=filtered_daily['date'],
+        y=filtered_daily['satisfaction_score'],
+        mode='lines+markers',
+        name='Daily Satisfaction',
+        line=dict(color='#1f77b4', width=2),
+        marker=dict(
+            size=6,
+            color=np.where(filtered_daily['satisfaction_score'] < 9.0, 'red', '#1f77b4'),
+            line=dict(width=1, color='white')
+        ),
+        hovertemplate='<b>%{x|%B %d, %Y}</b><br>' +
+                      'Satisfaction: %{y}<br>' +
+                      '<extra></extra>'
+    ))
 
-            # Main satisfaction timeline
-            fig.add_trace(
-                go.Scatter(
-                    x=filtered_daily['date'],
-                    y=filtered_daily['satisfaction_score'],
-                    mode='lines+markers',
-                    name='Daily Satisfaction',
-                    line=dict(color='#667eea', width=3),
-                    marker=dict(
-                        size=8,
-                        color=['#ef4444' if score < 9.0 else '#10b981' for score in filtered_daily['satisfaction_score']],
-                        line=dict(width=2, color='white')
-                    ),
-                    hovertemplate='<b>%{x|%B %d, %Y}</b><br>Satisfaction: %{y}/10<extra></extra>'
-                ),
-                row=1, col=1
-            )
+    # Add target line
+    if show_target:
+        fig_timeline.add_hline(
+            y=9.0,
+            line_dash="dash",
+            line_color="green",
+            annotation_text="Target (9.0)",
+            annotation_position="bottom right"
+        )
 
-            # Add moving average if enough data points
-            if len(filtered_daily) >= 7:
-                filtered_daily['ma_7'] = filtered_daily['satisfaction_score'].rolling(window=7).mean()
-                fig.add_trace(
-                    go.Scatter(
-                        x=filtered_daily['date'],
-                        y=filtered_daily['ma_7'],
-                        mode='lines',
-                        name='7-day Moving Average',
-                        line=dict(color='#764ba2', width=2, dash='dash'),
-                        hovertemplate='<b>%{x|%B %d, %Y}</b><br>7-day Average: %{y:.2f}<extra></extra>'
-                    ),
-                    row=1, col=1
-                )
-
-            # Trend decomposition in second subplot
-            if len(filtered_daily) >= 14:
-                trend_values = filtered_daily['satisfaction_score'].rolling(window=7).mean().diff()
-                fig.add_trace(
-                    go.Scatter(
-                        x=filtered_daily['date'],
-                        y=trend_values,
-                        mode='lines',
-                        name='Trend Direction',
-                        line=dict(color='#f59e0b', width=2),
-                        hovertemplate='<b>%{x|%B %d, %Y}</b><br>Trend: %{y:.3f}<extra></extra>'
-                    ),
-                    row=2, col=1
-                )
-                fig.add_hline(y=0, line_dash="solid", line_color="#64748b", line_width=1, row=2, col=1)
-
-        else:
-            # Standard single plot
-            fig = go.Figure()
-
-            fig.add_trace(go.Scatter(
-                x=filtered_daily['date'],
-                y=filtered_daily['satisfaction_score'],
-                mode='lines+markers',
-                name='Daily Satisfaction',
-                line=dict(color='#667eea', width=3),
-                marker=dict(
-                    size=8,
-                    color=['#ef4444' if score < 9.0 else '#10b981' for score in filtered_daily['satisfaction_score']],
-                    line=dict(width=2, color='white')
-                ),
-                hovertemplate='<b>%{x|%B %d, %Y}</b><br>Satisfaction: %{y}/10<extra></extra>'
+    # Highlight weekends
+    if show_weekends:
+        weekend_data = filtered_daily[filtered_daily['is_weekend']]
+        if not weekend_data.empty:
+            fig_timeline.add_trace(go.Scatter(
+                x=weekend_data['date'],
+                y=weekend_data['satisfaction_score'],
+                mode='markers',
+                name='Weekends',
+                marker=dict(size=8, color='orange', symbol='diamond'),
+                hovertemplate='<b>%{x|%B %d, %Y} (Weekend)</b><br>' +
+                              'Satisfaction: %{y}<br>' +
+                              '<extra></extra>'
             ))
 
-        # Add target line if requested
-        if show_target:
-            if show_trends:
-                fig.add_hline(y=9.0, line_dash="dash", line_color="#10b981", line_width=2, 
-                            annotation_text="🎯 Target (9.0)", row=1, col=1)
-            else:
-                fig.add_hline(y=9.0, line_dash="dash", line_color="#10b981", line_width=2,
-                            annotation_text="🎯 Target (9.0)")
+    # Update layout for responsiveness
+    fig_timeline.update_layout(
+        title="Daily Customer Satisfaction Scores",
+        xaxis_title="Date",
+        yaxis_title="Satisfaction Score",
+        hovermode='closest',
+        height=500,
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
 
-        # Add weekend highlighting if requested
-        if show_weekends:
-            weekend_data = filtered_daily[filtered_daily['is_weekend']]
-            if not weekend_data.empty:
-                if show_trends:
-                    fig.add_trace(go.Scatter(
-                        x=weekend_data['date'],
-                        y=weekend_data['satisfaction_score'],
-                        mode='markers',
-                        name='🔸 Weekends',
-                        marker=dict(size=12, color='#f59e0b', symbol='diamond', 
-                                   line=dict(width=2, color='white')),
-                        hovertemplate='<b>%{x|%B %d, %Y} (Weekend)</b><br>Satisfaction: %{y}/10<extra></extra>'
-                    ), row=1, col=1)
-                else:
-                    fig.add_trace(go.Scatter(
-                        x=weekend_data['date'],
-                        y=weekend_data['satisfaction_score'],
-                        mode='markers',
-                        name='🔸 Weekends',
-                        marker=dict(size=12, color='#f59e0b', symbol='diamond', 
-                                   line=dict(width=2, color='white')),
-                        hovertemplate='<b>%{x|%B %d, %Y} (Weekend)</b><br>Satisfaction: %{y}/10<extra></extra>'
-                    ))
+    # Make responsive
+    fig_timeline.update_layout(
+        autosize=True,
+        margin=dict(l=0, r=0, t=50, b=0),
+    )
 
-        # Enhanced layout configuration
-        fig.update_layout(
-            title="📊 Advanced Daily Customer Satisfaction Analysis",
-            font=dict(family="Inter", size=12),
-            hovermode='x unified',
-            height=600 if show_trends else 500,
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="#e2e8f0",
-                borderwidth=1
-            ),
-            plot_bgcolor='rgba(248,250,252,0.8)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(
-                title="📅 Date",
-                gridcolor='rgba(226,232,240,0.8)',
-                gridwidth=1,
-                showspikes=True,
-                spikethickness=1,
-                spikecolor="#667eea"
-            ),
-            yaxis=dict(
-                title="⭐ Satisfaction Score",
-                gridcolor='rgba(226,232,240,0.8)',
-                gridwidth=1,
-                range=[0, 10]
-            )
-        )
+    st.plotly_chart(fig_timeline, use_container_width=True)
 
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Enhanced summary statistics with advanced metrics
-        st.markdown('<h3 class="subsection-header">📊 Advanced Performance Analytics</h3>', unsafe_allow_html=True)
-
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            avg_score = filtered_daily['satisfaction_score'].mean()
-            score_std = filtered_daily['satisfaction_score'].std()
-            st.markdown(f"""
-            <div class="metric-card status-excellent">
-                <h3>📈 Average Score</h3>
-                <h1>{avg_score:.2f}</h1>
-                <p>±{score_std:.2f} std deviation<br>Performance rating</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col2:
-            below_target = (filtered_daily['satisfaction_score'] < 9.0).sum()
-            target_rate = ((len(filtered_daily) - below_target) / len(filtered_daily)) * 100
-            st.markdown(f"""
-            <div class="metric-card {'status-excellent' if target_rate >= 80 else 'status-good' if target_rate >= 60 else 'status-needs-improvement'}">
-                <h3>🎯 Target Achievement</h3>
-                <h1>{target_rate:.1f}%</h1>
-                <p>{below_target} days below target<br>out of {len(filtered_daily)} days</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col3:
-            if len(filtered_daily) > 0:
-                best_day = filtered_daily.loc[filtered_daily['satisfaction_score'].idxmax()]
-                st.markdown(f"""
-                <div class="metric-card status-excellent">
-                    <h3>🏆 Peak Performance</h3>
-                    <h1>{best_day['satisfaction_score']:.1f}</h1>
-                    <p>{best_day['date'].strftime('%B %d, %Y')}<br>{best_day['day_name']}</p>
-                </div>
-                """, unsafe_allow_html=True)
-
-        with col4:
-            if len(filtered_daily) >= 7:
-                recent_trend = filtered_daily.tail(7)['satisfaction_score'].mean() - filtered_daily.head(7)['satisfaction_score'].mean()
-                trend_status = "status-excellent" if recent_trend > 0 else "status-needs-improvement" if recent_trend < -0.2 else "status-good"
-                trend_icon = "📈" if recent_trend > 0 else "📉" if recent_trend < 0 else "➡️"
-                st.markdown(f"""
-                <div class="metric-card {trend_status}">
-                    <h3>📊 Performance Trend</h3>
-                    <h1 style="font-size: 1.8rem;">{trend_icon}</h1>
-                    <p>{recent_trend:+.2f} recent change<br>7-day comparison</p>
-                </div>
-                """, unsafe_allow_html=True)
-
-        # Advanced insights section
-        if len(filtered_daily) >= 14:
-            st.markdown('<h3 class="subsection-header">🔍 Advanced Insights</h3>', unsafe_allow_html=True)
-
-            insight_col1, insight_col2 = st.columns(2)
-
-            with insight_col1:
-                # Weekend vs Weekday analysis
-                weekend_scores = filtered_daily[filtered_daily['is_weekend']]['satisfaction_score'].mean()
-                weekday_scores = filtered_daily[~filtered_daily['is_weekend']]['satisfaction_score'].mean()
-                weekend_diff = weekend_scores - weekday_scores
-
-                st.markdown(f"""
-                <div class="metric-card">
-                    <h3>📅 Weekend vs Weekday Analysis</h3>
-                    <div style="display: flex; justify-content: space-between; margin: 1rem 0;">
-                        <div>
-                            <strong>Weekends:</strong> {weekend_scores:.2f}<br>
-                            <strong>Weekdays:</strong> {weekday_scores:.2f}
-                        </div>
-                        <div style="text-align: right;">
-                            <strong>Difference:</strong><br>
-                            <span style="color: {'#10b981' if weekend_diff > 0 else '#ef4444'};">{weekend_diff:+.2f}</span>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: #64748b;">
-                        {'Weekends perform better' if weekend_diff > 0 else 'Weekdays perform better' if weekend_diff < 0 else 'Similar performance'}
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-
-            with insight_col2:
-                # Volatility analysis
-                volatility = filtered_daily['satisfaction_score'].std()
-                volatility_status = "Low" if volatility < 0.5 else "Medium" if volatility < 1.0 else "High"
-                volatility_color = "#10b981" if volatility < 0.5 else "#f59e0b" if volatility < 1.0 else "#ef4444"
-
-                st.markdown(f"""
-                <div class="metric-card">
-                    <h3>📊 Score Volatility Analysis</h3>
-                    <div style="text-align: center; margin: 1rem 0;">
-                        <div style="font-size: 2rem; color: {volatility_color}; font-weight: 700;">
-                            {volatility:.2f}
-                        </div>
-                        <div style="color: {volatility_color}; font-weight: 600;">
-                            {volatility_status} Volatility
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: #64748b;">
-                        Standard deviation of satisfaction scores over the period
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-
-# TAB 2: Monthly Comparison with Advanced Analytics from Original Code
-with tab2:
-    st.markdown('<h2 class="section-header fadeInUp">📊 Monthly Performance Analysis</h2>', unsafe_allow_html=True)
-
-    # Advanced metric selector with enhanced features
-    metric_options = {
-        'Overall Satisfaction': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '⭐',
-            'description': 'Overall customer satisfaction rating across all touchpoints',
-            'benchmark': 8.5, 'industry_avg': 8.2
-        },
-        'Likelihood to Buy Again': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '🛒',
-            'description': 'Customer retention and repeat purchase intention',
-            'benchmark': 8.3, 'industry_avg': 7.9
-        },
-        'Likelihood to Recommend': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '👍',
-            'description': 'Net Promoter Score (NPS) equivalent metric',
-            'benchmark': 8.7, 'industry_avg': 8.1
-        },
-        'Site Design': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '🎨',
-            'description': 'User experience and interface design satisfaction',
-            'benchmark': 8.8, 'industry_avg': 8.4
-        },
-        'Ease of Finding': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '🔍',
-            'description': 'Product discovery and search functionality',
-            'benchmark': 8.6, 'industry_avg': 8.0
-        },
-        'Product Information Clarity': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '📋',
-            'description': 'Quality and completeness of product descriptions',
-            'benchmark': 8.9, 'industry_avg': 8.3
-        },
-        'Charges Stated Clearly': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '💰',
-            'description': 'Pricing transparency and fee disclosure',
-            'benchmark': 9.1, 'industry_avg': 8.6
-        },
-        'Checkout Process': {
-            'target': 9.0, 'format': '{:.2f}', 'icon': '✅',
-            'description': 'Payment and order completion experience',
-            'benchmark': 8.4, 'industry_avg': 7.8
-        }
-    }
-
-    st.markdown('<div class="filter-container">', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([3, 1, 1])
-
+    # Summary statistics
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        selected_metric = st.selectbox(
-            "📊 Select Metric for Deep Analysis:",
-            options=list(metric_options.keys()),
-            index=6,  # Default to "Charges Stated Clearly"
-            key="metric_selector_advanced",
-            help="Choose which customer satisfaction metric to analyze in detail"
-        )
+        avg_score = filtered_daily['satisfaction_score'].mean()
+        st.metric("Average Score", f"{avg_score:.1f}")
 
     with col2:
-        show_benchmarks = st.checkbox(
-            "📊 Show Benchmarks",
-            value=True,
-            key="show_benchmarks",
-            help="Display internal benchmarks and industry averages"
-        )
+        below_target = (filtered_daily['satisfaction_score'] < 9.0).sum()
+        st.metric("Days Below Target", below_target)
 
     with col3:
-        analysis_type = st.selectbox(
-            "🔍 Analysis Type:",
-            options=["Standard", "Advanced", "Predictive"],
-            key="analysis_type_selector",
-            help="Choose the depth of analysis"
-        )
+        best_day = filtered_daily.loc[filtered_daily['satisfaction_score'].idxmax()]
+        st.metric("Best Score", f"{best_day['satisfaction_score']:.1f}")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col4:
+        worst_day = filtered_daily.loc[filtered_daily['satisfaction_score'].idxmin()]
+        st.metric("Lowest Score", f"{worst_day['satisfaction_score']:.1f}")
 
-    # Display metric information
-    metric_info = metric_options[selected_metric]
+# TAB 2: Monthly Comparison (Enhanced Version)
+with tab2:
+    st.header("Monthly Performance Comparison")
 
-    st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; padding: 2rem; border-radius: 16px; margin: 1.5rem 0;
-                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="font-size: 3rem;">{metric_info['icon']}</div>
-            <div>
-                <h2 style="margin: 0; font-size: 1.5rem;">{selected_metric}</h2>
-                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">{metric_info['description']}</p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Enhanced metric selector (same as shown in the image)
+    metric_options = {
+        'Overall Satisfaction': {'target': 9.0, 'format': '{:.2f}'},
+        'Likelihood to Buy Again': {'target': 9.0, 'format': '{:.2f}'},
+        'Likelihood to Recommend': {'target': 9.0, 'format': '{:.2f}'},
+        'Site Design': {'target': 9.0, 'format': '{:.2f}'},
+        'Ease of Finding': {'target': 9.0, 'format': '{:.2f}'},
+        'Product Information Clarity': {'target': 9.0, 'format': '{:.2f}'},
+        'Charges Stated Clearly': {'target': 9.0, 'format': '{:.2f}'},
+        'Checkout Process': {'target': 9.0, 'format': '{:.2f}'}
+    }
 
-    target_score = metric_info['target']
-    score_format = metric_info['format']
+    selected_metric = st.selectbox(
+        "Select Metric:",
+        options=list(metric_options.keys()),
+        index=6,  # Default to "Charges Stated Clearly" like in the image
+        key="metric_selector"
+    )
 
-    # Enhanced data generation with more sophisticated modeling
+    target_score = metric_options[selected_metric]['target']
+    score_format = metric_options[selected_metric]['format']
+
+    # Generate realistic data for the selected metric
     @st.cache_data
-    def generate_advanced_metric_data(metric_name, analysis_type):
+    def generate_metric_data(metric_name):
+        # Base scores for different months (realistic patterns)
         month_data = {
-            'May-June 2025': {'period': '2025-05-30 to 2025-06-30', 'total_days': 32, 'base_score': 9.48, 'seasonal_factor': 1.02},
-            'July 2025': {'period': '2025-07-01 to 2025-07-31', 'total_days': 31, 'base_score': 9.22, 'seasonal_factor': 0.98},
-            'August 2025': {'period': '2025-08-01 to 2025-08-31', 'total_days': 31, 'base_score': 9.16, 'seasonal_factor': 0.96},
-            'September 2025': {'period': '2025-09-01 to 2025-09-30', 'total_days': 30, 'base_score': 9.43, 'seasonal_factor': 1.01}
+            'May-June 2025': {
+                'period': '2025-05-30 to 2025-06-30',
+                'total_days': 32,
+                'base_score': 9.48
+            },
+            'July 2025': {
+                'period': '2025-07-01 to 2025-07-31', 
+                'total_days': 31,
+                'base_score': 9.22
+            },
+            'August 2025': {
+                'period': '2025-08-01 to 2025-08-31',
+                'total_days': 31,
+                'base_score': 9.16
+            },
+            'September 2025': {
+                'period': '2025-09-01 to 2025-09-30',
+                'total_days': 30,
+                'base_score': 9.43
+            }
         }
 
-        # Enhanced metric variations with more sophisticated patterns
+        # Add some variation for different metrics
         metric_variations = {
             'Overall Satisfaction': [0, -0.1, -0.2, 0.05],
             'Likelihood to Buy Again': [0.1, -0.05, -0.15, 0.08],
@@ -1123,7 +306,7 @@ with tab2:
             'Site Design': [0.2, 0.15, 0.1, 0.25],
             'Ease of Finding': [0.15, 0.08, 0.05, 0.18],
             'Product Information Clarity': [0.12, 0.06, 0.02, 0.15],
-            'Charges Stated Clearly': [0, 0, 0, 0],
+            'Charges Stated Clearly': [0, 0, 0, 0],  # Base scores (as shown in image)
             'Checkout Process': [-0.2, -0.15, -0.25, -0.12]
         }
 
@@ -1131,307 +314,600 @@ with tab2:
 
         enhanced_data = []
         for i, (month, data) in enumerate(month_data.items()):
-            base_score = data['base_score'] + variations[i]
-            seasonal_adjusted = base_score * data['seasonal_factor']
-
-            # Add noise for realism
-            np.random.seed(42 + i)
-            noise = np.random.normal(0, 0.05)
-            final_score = round(seasonal_adjusted + noise, 2)
-
-            days_below = max(0, int(abs(target_score - final_score) * data['total_days'] / 4)) if final_score < target_score else 0
-
-            # Advanced metrics calculation
-            confidence_interval = 0.15
-            volatility = abs(variations[i]) * 0.5 + 0.1
+            score = data['base_score'] + variations[i]
+            days_below = max(0, int((target_score - score) * data['total_days'] / 2))
 
             enhanced_data.append({
                 'month': month,
                 'period': data['period'],
                 'total_days': data['total_days'],
-                'average_score': final_score,
+                'average_score': score,
                 'days_below_target': days_below,
-                'days_below_percentage': round((days_below / data['total_days']) * 100, 1),
-                'performance_vs_target': round(final_score - target_score, 2),
-                'classification': 'Excellent' if final_score >= target_score else 'Good' if final_score >= target_score - 0.5 else 'Needs Improvement',
-                'confidence_lower': round(final_score - confidence_interval, 2),
-                'confidence_upper': round(final_score + confidence_interval, 2),
-                'volatility': round(volatility, 2),
-                'seasonal_factor': data['seasonal_factor']
+                'days_below_percentage': (days_below / data['total_days']) * 100,
+                'performance_vs_target': score - target_score,
+                'classification': 'Excellent' if score >= target_score else 'Good' if score >= target_score - 0.5 else 'Needs Improvement'
             })
 
         return pd.DataFrame(enhanced_data)
 
-    metric_data = generate_advanced_metric_data(selected_metric, analysis_type)
+    metric_data = generate_metric_data(selected_metric)
 
-    # Enhanced month selector with select all/none functionality
-    st.markdown("### 📅 Period Selection")
-    col1, col2, col3 = st.columns([2, 1, 1])
-
-    with col1:
-        comparison_months = st.multiselect(
-            "Select months to compare:",
-            options=metric_data['month'].tolist(),
-            default=metric_data['month'].tolist(),
-            key="monthly_comparison_advanced",
-            help="Choose which months to include in the analysis"
-        )
-
-    with col2:
-        if st.button("✅ Select All", key="select_all_months", use_container_width=True):
-            st.session_state.monthly_comparison_advanced = metric_data['month'].tolist()
-            st.rerun()
-
-    with col3:
-        if st.button("❌ Clear All", key="clear_all_months", use_container_width=True):
-            st.session_state.monthly_comparison_advanced = []
-            st.rerun()
+    # Monthly selector for comparison
+    comparison_months = st.multiselect(
+        "Select months to compare:",
+        options=metric_data['month'].tolist(),
+        default=metric_data['month'].tolist(),
+        key="monthly_comparison_enhanced"
+    )
 
     if comparison_months:
         comparison_data = metric_data[metric_data['month'].isin(comparison_months)]
 
-        # Enhanced monthly performance cards with advanced metrics
-        st.markdown('<h3 class="subsection-header">📊 Monthly Performance Deep Dive</h3>', unsafe_allow_html=True)
+        # Enhanced Monthly Performance Cards
+        st.subheader(f"Monthly Performance Cards - {selected_metric}")
 
-        if len(comparison_data) > 0:
-            cols = st.columns(min(len(comparison_data), 4))
-            for i, (_, month_data_row) in enumerate(comparison_data.iterrows()):
-                col_idx = i % 4
-                with cols[col_idx]:
-                    score = month_data_row['average_score']
-                    classification = month_data_row['classification']
+        cols = st.columns(len(comparison_data))
+        for i, (_, month_data_row) in enumerate(comparison_data.iterrows()):
+            with cols[i]:
+                score = month_data_row['average_score']
+                classification = month_data_row['classification']
 
-                    # Enhanced status colors and animations
-                    if classification == 'Excellent':
-                        status_class = "status-excellent"
-                        status_color = "#10b981"
-                        status_icon = "🌟"
-                        performance_emoji = "🚀"
-                    elif classification == 'Good':
-                        status_class = "status-good"
-                        status_color = "#f59e0b"
-                        status_icon = "⚡"
-                        performance_emoji = "👍"
-                    else:
-                        status_class = "status-needs-improvement"
-                        status_color = "#ef4444"
-                        status_icon = "⚠️"
-                        performance_emoji = "🎯"
+                # Color coding based on performance
+                if classification == 'Excellent':
+                    color_class = "risk-low"
+                    bg_color = "#d4f7d4"
+                elif classification == 'Good':
+                    color_class = "risk-medium" 
+                    bg_color = "#fff4d4"
+                else:
+                    color_class = "risk-high"
+                    bg_color = "#ffd4d4"
 
-                    # Calculate relative performance
-                    vs_benchmark = score - metric_info['benchmark']
-                    vs_industry = score - metric_info['industry_avg']
+                st.markdown(f"""
+                <div style="
+                    background: {bg_color};
+                    padding: 1rem;
+                    border-radius: 10px;
+                    border-left: 4px solid {'#00aa00' if classification == 'Excellent' else '#ffaa00' if classification == 'Good' else '#ff4444'};
+                    margin: 0.5rem 0;
+                    text-align: center;
+                ">
+                    <h4 style="margin: 0; color: #333;">{month_data_row["month"]}</h4>
+                    <p style="font-size: 0.8em; color: #666; margin: 0.2rem 0;">{month_data_row["period"]}</p>
+                    <p style="font-size: 0.8em; color: #666; margin: 0.2rem 0;">Total days: {month_data_row["total_days"]}</p>
+                    <h2 style="margin: 0.5rem 0; color: #333;">Average {selected_metric}:</h2>
+                    <h1 style="margin: 0; color: {'#00aa00' if classification == 'Excellent' else '#ffaa00' if classification == 'Good' else '#ff4444'};">
+                        {score_format.format(score)}
+                    </h1>
+                    <p style="font-size: 0.9em; margin: 0.5rem 0;"><strong>Days below target:</strong> {month_data_row["days_below_target"]} ({month_data_row["days_below_percentage"]:.1f}%)</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-                    st.markdown(f"""
-                    <div class="metric-card {status_class}">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="margin: 0; font-size: 1.1rem;">{month_data_row["month"].split()[0]} {performance_emoji}</h3>
-                            <span style="font-size: 1.5rem;">{status_icon}</span>
-                        </div>
+        # Enhanced visualizations
+        col1, col2 = st.columns(2)
 
-                        <div style="text-align: center; margin: 1.5rem 0;">
-                            <div style="font-size: 3.2rem; font-weight: 800; color: {status_color}; line-height: 1;">
-                                {score_format.format(score)}
-                            </div>
-                            <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
-                                {classification} Performance
-                            </div>
-                        </div>
+        with col1:
+            # Bar chart with target line and color coding
+            fig_bar_enhanced = px.bar(
+                comparison_data,
+                x='month',
+                y='average_score',
+                title=f"Monthly Comparison - {selected_metric}",
+                color='classification',
+                color_discrete_map={
+                    'Excellent': '#00aa00',
+                    'Good': '#ffaa00', 
+                    'Needs Improvement': '#ff4444'
+                },
+                text='average_score',
+                hover_data=['days_below_target', 'days_below_percentage']
+            )
 
-                        <div style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                            <div style="font-size: 0.8rem; margin-bottom: 0.5rem;">
-                                <strong>📊 Period:</strong> {month_data_row["total_days"]} days
-                            </div>
-                            <div style="font-size: 0.8rem; margin-bottom: 0.5rem;">
-                                <strong>🎯 vs Target:</strong> 
-                                <span style="color: {'#10b981' if month_data_row['performance_vs_target'] >= 0 else '#ef4444'};">
-                                    {month_data_row['performance_vs_target']:+.2f}
-                                </span>
-                            </div>
-                            <div style="font-size: 0.8rem;">
-                                <strong>📈 vs Benchmark:</strong> 
-                                <span style="color: {'#10b981' if vs_benchmark >= 0 else '#ef4444'};">
-                                    {vs_benchmark:+.2f}
-                                </span>
-                            </div>
-                        </div>
+            # Add target line
+            fig_bar_enhanced.add_hline(
+                y=target_score, 
+                line_dash="dash", 
+                line_color="red", 
+                annotation_text=f"Target ({target_score})",
+                annotation_position="top right"
+            )
 
-                        {'<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem;">' if show_benchmarks else ''}
-                        {'<strong>🏆 Confidence Range:</strong><br>' if show_benchmarks else ''}
-                        {f'{month_data_row["confidence_lower"]:.2f} - {month_data_row["confidence_upper"]:.2f}' if show_benchmarks else ''}
-                        {'</div>' if show_benchmarks else ''}
-                    </div>
-                    """, unsafe_allow_html=True)
+            # Update text format
+            fig_bar_enhanced.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig_bar_enhanced.update_layout(
+                height=450,
+                showlegend=True,
+                yaxis_title="Average Score",
+                xaxis_title="Period"
+            )
+            st.plotly_chart(fig_bar_enhanced, use_container_width=True)
 
-            # Advanced visualizations with enhanced interactivity
-            st.markdown('<h3 class="subsection-header">📈 Advanced Performance Visualizations</h3>', unsafe_allow_html=True)
+        with col2:
+            # Performance vs Target analysis
+            fig_performance = px.bar(
+                comparison_data,
+                x='month',
+                y='performance_vs_target',
+                title=f"Performance vs Target - {selected_metric}",
+                color='performance_vs_target',
+                color_continuous_scale='RdYlGn',
+                text='performance_vs_target'
+            )
 
-            viz_col1, viz_col2 = st.columns(2)
+            # Add zero line
+            fig_performance.add_hline(y=0, line_dash="solid", line_color="black", line_width=1)
 
-            with viz_col1:
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+            fig_performance.update_traces(texttemplate='%{text:+.2f}', textposition='outside')
+            fig_performance.update_layout(
+                height=450,
+                yaxis_title="Difference from Target",
+                xaxis_title="Period"
+            )
+            st.plotly_chart(fig_performance, use_container_width=True)
 
-                # Enhanced performance chart with benchmarks
-                fig_performance = go.Figure()
+        # Detailed performance summary
+        st.subheader(f"Detailed Performance Summary - {selected_metric}")
 
-                # Main performance bars
-                fig_performance.add_trace(go.Bar(
-                    x=comparison_data['month'],
-                    y=comparison_data['average_score'],
-                    name='Actual Performance',
-                    marker_color=[
-                        '#10b981' if cls == 'Excellent' else '#f59e0b' if cls == 'Good' else '#ef4444'
-                        for cls in comparison_data['classification']
-                    ],
-                    text=comparison_data['average_score'],
-                    texttemplate='%{text:.2f}',
-                    textposition='outside',
-                    hovertemplate='<b>%{x}</b><br>Score: %{y:.2f}/10<extra></extra>'
-                ))
+        # Summary metrics
+        summary_cols = st.columns(4)
 
-                if show_benchmarks:
-                    # Add benchmark lines
-                    fig_performance.add_hline(
-                        y=target_score,
-                        line_dash="dash",
-                        line_color="#10b981",
-                        line_width=3,
-                        annotation_text=f"🎯 Target ({target_score})"
-                    )
+        with summary_cols[0]:
+            overall_avg = comparison_data['average_score'].mean()
+            st.metric(
+                "Overall Average", 
+                f"{score_format.format(overall_avg)}",
+                delta=f"{overall_avg - target_score:+.2f}" if overall_avg != target_score else None
+            )
 
-                    fig_performance.add_hline(
-                        y=metric_info['benchmark'],
-                        line_dash="dot",
-                        line_color="#667eea",
-                        line_width=2,
-                        annotation_text=f"📊 Internal Benchmark ({metric_info['benchmark']})"
-                    )
+        with summary_cols[1]:
+            excellent_months = (comparison_data['classification'] == 'Excellent').sum()
+            st.metric("Excellent Months", f"{excellent_months}/{len(comparison_data)}")
 
-                    fig_performance.add_hline(
-                        y=metric_info['industry_avg'],
-                        line_dash="dashdot",
-                        line_color="#9ca3af",
-                        line_width=2,
-                        annotation_text=f"🏭 Industry Average ({metric_info['industry_avg']})"
-                    )
+        with summary_cols[2]:
+            total_days_below = comparison_data['days_below_target'].sum()
+            total_days = comparison_data['total_days'].sum()
+            st.metric("Total Days Below Target", f"{total_days_below}/{total_days}")
 
-                fig_performance.update_layout(
-                    title=f"📊 {selected_metric} - Monthly Performance Analysis",
-                    font=dict(family="Inter", size=12),
-                    plot_bgcolor='rgba(248,250,252,0.8)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    height=500,
-                    showlegend=False,
-                    xaxis=dict(
-                        title="📅 Period",
-                        gridcolor='rgba(226,232,240,0.8)',
-                        tickangle=45
-                    ),
-                    yaxis=dict(
-                        title="⭐ Average Score",
-                        gridcolor='rgba(226,232,240,0.8)',
-                        range=[
-                            min(comparison_data['average_score'].min() - 0.5, metric_info['industry_avg'] - 0.3),
-                            max(comparison_data['average_score'].max() + 0.5, target_score + 0.2)
-                        ]
-                    )
-                )
+        with summary_cols[3]:
+            avg_days_below_pct = comparison_data['days_below_percentage'].mean()
+            st.metric("Avg % Days Below Target", f"{avg_days_below_pct:.1f}%")
 
-                st.plotly_chart(fig_performance, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+        # Trend analysis
+        if len(comparison_data) > 1:
+            st.subheader("Trend Analysis")
 
-            with viz_col2:
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+            # Line chart showing trend over time
+            fig_trend = px.line(
+                comparison_data,
+                x='month',
+                y='average_score',
+                title=f"Performance Trend - {selected_metric}",
+                markers=True,
+                line_shape='linear'
+            )
 
-                # Enhanced gap analysis with confidence intervals
-                fig_gap = go.Figure()
+            fig_trend.add_hline(
+                y=target_score,
+                line_dash="dash",
+                line_color="red",
+                annotation_text=f"Target ({target_score})"
+            )
 
-                if analysis_type == "Advanced":
-                    # Add confidence intervals
-                    fig_gap.add_trace(go.Scatter(
-                        x=comparison_data['month'],
-                        y=comparison_data['confidence_upper'],
-                        mode='lines',
-                        line=dict(color='rgba(102, 126, 234, 0)'),
-                        showlegend=False,
-                        hoverinfo='skip'
-                    ))
+            fig_trend.update_layout(height=400)
+            st.plotly_chart(fig_trend, use_container_width=True)
 
-                    fig_gap.add_trace(go.Scatter(
-                        x=comparison_data['month'],
-                        y=comparison_data['confidence_lower'],
-                        mode='lines',
-                        line=dict(color='rgba(102, 126, 234, 0)'),
-                        fill='tonexty',
-                        fillcolor='rgba(102, 126, 234, 0.2)',
-                        name='Confidence Interval',
-                        hoverinfo='skip'
-                    ))
+            # Trend direction
+            first_score = comparison_data.iloc[0]['average_score']
+            last_score = comparison_data.iloc[-1]['average_score']
+            trend_direction = last_score - first_score
 
-                # Performance gap bars
-                fig_gap.add_trace(go.Bar(
-                    x=comparison_data['month'],
-                    y=comparison_data['performance_vs_target'],
-                    name='Gap vs Target',
-                    marker_color=[
-                        '#10b981' if gap >= 0 else '#ef4444' if gap < -0.3 else '#f59e0b'
-                        for gap in comparison_data['performance_vs_target']
-                    ],
-                    text=comparison_data['performance_vs_target'],
-                    texttemplate='%{text:+.2f}',
-                    textposition='outside',
-                    hovertemplate='<b>%{x}</b><br>Gap: %{y:+.2f} points<extra></extra>'
-                ))
+            if trend_direction > 0.1:
+                trend_emoji = "📈"
+                trend_text = "Improving"
+                trend_color = "green"
+            elif trend_direction < -0.1:
+                trend_emoji = "📉"
+                trend_text = "Declining"
+                trend_color = "red"
+            else:
+                trend_emoji = "➡️"
+                trend_text = "Stable"
+                trend_color = "blue"
 
-                fig_gap.add_hline(y=0, line_dash="solid", line_color="#64748b", line_width=2)
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; border-radius: 10px; background: #f0f2f6;">
+                <h3 style="color: {trend_color};">{trend_emoji} Overall Trend: {trend_text}</h3>
+                <p>Change from first to last period: <strong style="color: {trend_color};">{trend_direction:+.2f} points</strong></p>
+            </div>
+            """, unsafe_allow_html=True)
 
-                fig_gap.update_layout(
-                    title=f"🎯 Performance Gap Analysis - {selected_metric}",
-                    font=dict(family="Inter", size=12),
-                    plot_bgcolor='rgba(248,250,252,0.8)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    height=500,
-                    showlegend=analysis_type == "Advanced",
-                    xaxis=dict(
-                        title="📅 Period",
-                        gridcolor='rgba(226,232,240,0.8)',
-                        tickangle=45
-                    ),
-                    yaxis=dict(
-                        title="📈 Gap from Target",
-                        gridcolor='rgba(226,232,240,0.8)'
-                    )
-                )
+    else:
+        st.warning("Please select at least one month to compare.")
 
-                st.plotly_chart(fig_gap, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+# TAB 3: Critical Events (Enhanced Version)
+with tab3:
+    st.header("Critical Events Analysis")
 
-    # Advanced performance charts with business intelligence
-    st.markdown('<h3 class="subsection-header">📈 Advanced Performance Analytics</h3>', unsafe_allow_html=True)
+    # Enhanced filters with more options
+    col1, col2, col3 = st.columns(3)
 
-    chart_cols = st.columns(2)
+    with col1:
+        failure_threshold = st.slider(
+            "Filter by Failure %:",
+            min_value=0,
+            max_value=100,
+            value=0,
+            step=5,
+            key="failure_filter"
+        )
 
-    with chart_cols[0]:
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+    with col2:
+        promotion_filter = st.selectbox(
+            "Filter by Promotion:",
+            options=['All promotions', 'Without promo', 'No promotion', '4th of July Event 7% OFF', 'Anniversary Sale Kick Off', 'Father Day Special 15% OFF', 'Labor Day Sale', 'Summer Clearance 20% OFF', 'Back to School Furniture', 'Fall Collection Launch'],
+            key="promotion_filter_enhanced"
+        )
 
-        # Enhanced trend chart with forecasting
+    with col3:
+        severity_filter = st.multiselect(
+            "Filter by Severity:",
+            options=['Critical', 'High', 'Medium', 'Low'],
+            default=['Critical', 'High', 'Medium', 'Low'],
+            key="severity_filter_enhanced"
+        )
+
+    # Apply filters
+    filtered_events = events_df.copy()
+
+    # Filter by failure percentage
+    filtered_events = filtered_events[filtered_events['failure_percentage'] >= failure_threshold]
+
+    # Filter by promotion
+    if promotion_filter != 'All promotions':
+        filtered_events = filtered_events[filtered_events['promotion'] == promotion_filter]
+
+    # Filter by severity
+    filtered_events = filtered_events[filtered_events['severity'].isin(severity_filter)]
+
+    # Sort options
+    sort_options = st.columns(2)
+    with sort_options[0]:
+        sort_by = st.selectbox(
+            "Sort by:",
+            options=['date', 'failure_percentage', 'severity'],
+            key="events_sort_enhanced"
+        )
+
+    with sort_options[1]:
+        sort_order = st.radio(
+            "Sort order:", 
+            ['Ascending', 'Descending'], 
+            horizontal=True, 
+            key="events_order_enhanced"
+        )
+
+    # Sort the data
+    if sort_by == 'date':
+        sorted_events = filtered_events.sort_values('date', ascending=(sort_order == 'Ascending'))
+    elif sort_by == 'failure_percentage':
+        sorted_events = filtered_events.sort_values('failure_percentage', ascending=(sort_order == 'Ascending'))
+    else:  # severity
+        severity_order = {'Low': 1, 'Medium': 2, 'High': 3, 'Critical': 4}
+        sorted_events = filtered_events.copy()
+        sorted_events['severity_num'] = sorted_events['severity'].map(severity_order)
+        sorted_events = sorted_events.sort_values('severity_num', ascending=(sort_order == 'Ascending'))
+        sorted_events = sorted_events.drop('severity_num', axis=1)
+
+    # Display results summary
+    st.subheader(f"Events Analysis Results ({len(sorted_events)} events found)")
+
+    if not sorted_events.empty:
+        # Summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            avg_failure = sorted_events['failure_percentage'].mean()
+            st.metric("Avg Failure %", f"{avg_failure:.1f}%")
+
+        with col2:
+            critical_count = (sorted_events['severity'] == 'Critical').sum()
+            st.metric("Critical Events", critical_count)
+
+        with col3:
+            high_failure = (sorted_events['failure_percentage'] >= 70).sum()
+            st.metric("High Risk Days", high_failure)
+
+        with col4:
+            promo_events = (sorted_events['promotion'].str.contains('OFF|Sale|Special', case=False, na=False)).sum()
+            st.metric("Promotion Days", promo_events)
+
+        # Enhanced table display
+        st.subheader("Detailed Events Table")
+
+        # Color coding for severity
+        def get_severity_color(severity):
+            colors = {
+                'Critical': '🔴',
+                'High': '🟠', 
+                'Medium': '🟡',
+                'Low': '🟢'
+            }
+            return colors.get(severity, '⚪')
+
+        # Display table with enhanced formatting
+        for idx, (_, event) in enumerate(sorted_events.iterrows()):
+            severity_icon = get_severity_color(event['severity'])
+
+            with st.expander(f"{severity_icon} {event['date'].strftime('%m/%d/%Y')} - {event['day_of_week']} - {event['failure_percentage']:.1f}% Failure ({event['severity']} Risk)"):
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.write(f"**Date:** {event['date'].strftime('%B %d, %Y')}")
+                    st.write(f"**Day:** {event['day_of_week']}")
+
+                with col2:
+                    st.write(f"**Failed Metrics:** {event['failed_metrics']}")
+                    st.write(f"**Failure Rate:** {event['failure_percentage']:.1f}%")
+
+                with col3:
+                    st.write(f"**Promotion:** {event['promotion']}")
+                    st.write(f"**Severity:** {event['severity']}")
+
+                # Action button for timeline highlighting
+                if st.button(f"🔍 Highlight {event['date'].strftime('%m/%d')} in Timeline", key=f"highlight_enhanced_{idx}"):
+                    st.success(f"✅ Date {event['date'].strftime('%Y-%m-%d')} highlighted in timeline!")
+                    st.balloons()
+
+        # Enhanced visualization
+        st.subheader("Events Impact Visualization")
+
+        # Create scatter plot
+        fig_events_enhanced = px.scatter(
+            sorted_events,
+            x='date',
+            y='failure_percentage',
+            color='severity',
+            size='failure_percentage',
+            hover_data=['day_of_week', 'failed_metrics', 'promotion'],
+            title="Event Risk Analysis Over Time",
+            color_discrete_map={
+                'Critical': '#ff0000',
+                'High': '#ff8800', 
+                'Medium': '#ffaa00',
+                'Low': '#00aa00'
+            },
+            labels={'failure_percentage': 'Failure Percentage (%)', 'date': 'Date'}
+        )
+
+        # Add risk threshold lines
+        fig_events_enhanced.add_hline(y=75, line_dash="dash", line_color="red", 
+                                    annotation_text="Critical Risk (75%+)")
+        fig_events_enhanced.add_hline(y=50, line_dash="dash", line_color="orange", 
+                                    annotation_text="High Risk (50%+)")
+        fig_events_enhanced.add_hline(y=25, line_dash="dash", line_color="yellow", 
+                                    annotation_text="Medium Risk (25%+)")
+
+        fig_events_enhanced.update_layout(
+            height=500,
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+
+        st.plotly_chart(fig_events_enhanced, use_container_width=True)
+
+        # Additional analysis charts
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Severity distribution
+            severity_counts = sorted_events['severity'].value_counts()
+            fig_severity = px.pie(
+                values=severity_counts.values,
+                names=severity_counts.index,
+                title="Events by Severity Level",
+                color_discrete_map={
+                    'Critical': '#ff0000',
+                    'High': '#ff8800', 
+                    'Medium': '#ffaa00',
+                    'Low': '#00aa00'
+                }
+            )
+            st.plotly_chart(fig_severity, use_container_width=True)
+
+        with col2:
+            # Failure rate by day of week
+            day_analysis = sorted_events.groupby('day_of_week')['failure_percentage'].mean().reset_index()
+            day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            day_analysis['day_of_week'] = pd.Categorical(day_analysis['day_of_week'], categories=day_order, ordered=True)
+            day_analysis = day_analysis.sort_values('day_of_week')
+
+            fig_days = px.bar(
+                day_analysis,
+                x='day_of_week',
+                y='failure_percentage',
+                title="Average Failure Rate by Day of Week",
+                color='failure_percentage',
+                color_continuous_scale='Reds'
+            )
+            st.plotly_chart(fig_days, use_container_width=True)
+
+    else:
+        st.warning("No events found with the current filter criteria. Try adjusting your filters.")
+        st.info("💡 Tip: Lower the failure percentage threshold or select 'All promotions' to see more results.")
+
+# TAB 4: Risk Analysis (Enhanced Version with Advanced Insights)
+with tab4:
+    st.header("Advanced Risk Analysis Dashboard")
+
+    # Enhanced metric selector for risk analysis
+    risk_metric_options = {
+        'Overall Satisfaction': {
+            'target': 9.0,
+            'current_scores': [9.48, 9.38, 9.36, 9.48],
+            'risk_factors': ['Service delays', 'Product quality issues', 'Delivery problems'],
+            'business_impact': 'Directly affects customer loyalty and retention rates. A decline in overall satisfaction can lead to reduced customer lifetime value and negative word-of-mouth marketing.',
+            'recommendations': [
+                'Implement proactive customer service monitoring with real-time alerts',
+                'Establish quality control checkpoints throughout the customer journey',
+                'Create customer feedback loops for rapid issue identification and resolution',
+                'Deploy sentiment analysis tools to monitor customer communications'
+            ]
+        },
+        'Likelihood to Buy Again': {
+            'target': 9.0,
+            'current_scores': [9.58, 9.33, 9.21, 9.56],
+            'risk_factors': ['Competitive pricing', 'Product availability', 'Customer service experience'],
+            'business_impact': 'Critical for revenue retention and customer lifetime value. Low scores indicate potential revenue leakage and increased customer acquisition costs.',
+            'recommendations': [
+                'Develop comprehensive customer loyalty programs with personalized incentives',
+                'Monitor competitor pricing strategies and implement dynamic pricing models',
+                'Improve inventory management systems to reduce stockouts',
+                'Create predictive models to identify at-risk customers for proactive retention efforts'
+            ]
+        },
+        'Likelihood to Recommend': {
+            'target': 9.0,
+            'current_scores': [9.43, 9.25, 9.06, 9.60],
+            'risk_factors': ['Word-of-mouth reputation', 'Social media presence', 'Customer advocacy'],
+            'business_impact': 'Affects organic growth and brand reputation in the market. Low recommendation scores can significantly impact new customer acquisition through referrals.',
+            'recommendations': [
+                'Create structured referral incentive programs with clear rewards',
+                'Monitor and actively respond to online reviews and social media mentions',
+                'Develop customer ambassador programs to leverage satisfied customers',
+                'Implement Net Promoter Score (NPS) tracking with follow-up actions for detractors'
+            ]
+        },
+        'Site Design': {
+            'target': 9.0,
+            'current_scores': [9.68, 9.37, 9.26, 9.73],
+            'risk_factors': ['User interface complexity', 'Mobile responsiveness', 'Loading speed'],
+            'business_impact': 'Influences first impressions and user engagement rates. Poor site design can lead to high bounce rates and reduced conversion rates.',
+            'recommendations': [
+                'Conduct regular UX/UI testing with A/B testing for continuous optimization',
+                'Implement mobile-first design principles with responsive layouts',
+                'Optimize site performance and loading times (target <3 seconds)',
+                'Use heatmap analysis to identify user behavior patterns and pain points'
+            ]
+        },
+        'Ease of Finding': {
+            'target': 9.0,
+            'current_scores': [9.63, 9.30, 9.21, 9.66],
+            'risk_factors': ['Search functionality', 'Product categorization', 'Navigation structure'],
+            'business_impact': 'Affects conversion rates and user satisfaction during shopping. Poor findability leads to increased cart abandonment and reduced sales.',
+            'recommendations': [
+                'Enhance search algorithm with AI-powered search suggestions and auto-complete',
+                'Improve product categorization and tagging with detailed filters',
+                'Implement intelligent product recommendations based on user behavior',
+                'Add visual search capabilities and improved site navigation structure'
+            ]
+        },
+        'Product Information Clarity': {
+            'target': 9.0,
+            'current_scores': [9.60, 9.28, 9.18, 9.63],
+            'risk_factors': ['Product descriptions accuracy', 'Image quality', 'Specification completeness'],
+            'business_impact': 'Reduces returns and increases purchase confidence. Clear product information directly correlates with reduced customer service inquiries and returns.',
+            'recommendations': [
+                'Standardize product information templates with consistent formatting',
+                'Implement 360-degree product views and high-resolution image galleries',
+                'Add customer Q&A sections and user-generated content for each product',
+                'Create detailed size guides and compatibility charts for furniture items'
+            ]
+        },
+        'Charges Stated Clearly': {
+            'target': 9.0,
+            'current_scores': [9.48, 9.22, 9.16, 9.43],
+            'risk_factors': ['Hidden fees', 'Shipping cost transparency', 'Tax calculation accuracy'],
+            'business_impact': 'Critical for trust and completing transactions without abandonment. Unclear pricing is a major cause of cart abandonment and customer complaints.',
+            'recommendations': [
+                'Display all fees upfront in the shopping process with no hidden costs',
+                'Implement transparent pricing calculator showing taxes, shipping, and fees',
+                'Provide clear breakdown of all charges before checkout with explanations',
+                'Add shipping cost estimator on product pages based on customer location'
+            ]
+        },
+        'Checkout Process': {
+            'target': 9.0,
+            'current_scores': [9.28, 9.07, 8.91, 9.31],
+            'risk_factors': ['Process complexity', 'Payment security', 'Guest checkout availability'],
+            'business_impact': 'Directly affects conversion rates and cart abandonment. Complex checkout processes can result in up to 70% cart abandonment rates.',
+            'recommendations': [
+                'Simplify checkout to minimum required steps (target: 3 steps or fewer)',
+                'Offer multiple payment options including digital wallets (Apple Pay, Google Pay)',
+                'Implement guest checkout and save-for-later options',
+                'Add progress indicators and clear security badges to build trust'
+            ]
+        }
+    }
+
+    # Metric selector for detailed risk analysis
+    selected_risk_metric = st.selectbox(
+        "Select Metric for Detailed Risk Analysis:",
+        options=list(risk_metric_options.keys()),
+        key="risk_metric_selector"
+    )
+
+    metric_info = risk_metric_options[selected_risk_metric]
+    target_score = metric_info['target']
+    monthly_scores = metric_info['current_scores']
+    months = ['May-June 2025', 'July 2025', 'August 2025', 'September 2025']
+
+    # Calculate risk metrics
+    performance_gaps = [target_score - score for score in monthly_scores]
+    risk_levels = ['High Risk' if gap > 0.5 else 'Medium Risk' if gap > 0.2 else 'Low Risk' for gap in performance_gaps]
+    trend_direction = monthly_scores[-1] - monthly_scores[0]
+
+    # Create comprehensive risk dashboard
+    st.subheader(f"Risk Analysis: {selected_risk_metric}")
+
+    # Key metrics overview
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        current_score = monthly_scores[-1]
+        delta_value = current_score - target_score
+        st.metric(
+            "Current Score",
+            f"{current_score:.2f}",
+            delta=f"{delta_value:+.2f}" if delta_value != 0 else None
+        )
+
+    with col2:
+        avg_score = sum(monthly_scores) / len(monthly_scores)
+        st.metric("Average Score", f"{avg_score:.2f}")
+
+    with col3:
+        max_gap = max(performance_gaps)
+        risk_status = 'High' if max_gap > 0.5 else 'Medium' if max_gap > 0.2 else 'Low'
+        st.metric("Risk Level", risk_status)
+
+    with col4:
+        trend_emoji = "📈" if trend_direction > 0.1 else "📉" if trend_direction < -0.1 else "➡️"
+        trend_text = "Improving" if trend_direction > 0.1 else "Declining" if trend_direction < -0.1 else "Stable"
+        st.metric("Trend", f"{trend_emoji} {trend_text}")
+
+    # Performance trend chart
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Monthly performance trend
         trend_df = pd.DataFrame({
             'Month': months,
             'Score': monthly_scores,
-            'Target': [target_score] * len(months)
+            'Target': [target_score] * len(months),
+            'Gap': performance_gaps,
+            'Risk_Level': risk_levels
         })
 
         fig_trend = go.Figure()
 
-        # Actual performance
+        # Actual scores line
         fig_trend.add_trace(go.Scatter(
             x=trend_df['Month'],
             y=trend_df['Score'],
             mode='lines+markers',
-            name='Actual Performance',
-            line=dict(color='#667eea', width=4),
-            marker=dict(size=10, color='#667eea', line=dict(width=2, color='white')),
-            hovertemplate='<b>%{x}</b><br>Score: %{y:.2f}<extra></extra>'
+            name='Actual Score',
+            line=dict(color='blue', width=3),
+            marker=dict(size=8)
         ))
 
         # Target line
@@ -1439,279 +915,348 @@ with tab2:
             x=trend_df['Month'],
             y=trend_df['Target'],
             mode='lines',
-            name='Target (9.0)',
-            line=dict(color='#10b981', width=3, dash='dash'),
-            hovertemplate='<b>%{x}</b><br>Target: %{y:.2f}<extra></extra>'
+            name='Target',
+            line=dict(color='red', width=2, dash='dash')
         ))
 
-        # Add confidence bands if detailed analysis
-        if analysis_depth != "Executive Summary":
-            upper_bound = [score + 0.15 for score in monthly_scores]
-            lower_bound = [score - 0.15 for score in monthly_scores]
-
-            fig_trend.add_trace(go.Scatter(
-                x=trend_df['Month'],
-                y=upper_bound,
-                mode='lines',
-                line=dict(color='rgba(102, 126, 234, 0)'),
-                showlegend=False,
-                hoverinfo='skip'
-            ))
-
-            fig_trend.add_trace(go.Scatter(
-                x=trend_df['Month'],
-                y=lower_bound,
-                mode='lines',
-                line=dict(color='rgba(102, 126, 234, 0)'),
-                fill='tonexty',
-                fillcolor='rgba(102, 126, 234, 0.2)',
-                name='Confidence Band',
-                hoverinfo='skip'
-            ))
-
         fig_trend.update_layout(
-            title=f"📊 {selected_risk_metric} - Performance Trend Analysis",
-            font=dict(family="Inter", size=12),
-            plot_bgcolor='rgba(248,250,252,0.8)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            height=500,
-            showlegend=True,
-            xaxis=dict(title="📅 Period", gridcolor='rgba(226,232,240,0.8)'),
-            yaxis=dict(title="⭐ Score", gridcolor='rgba(226,232,240,0.8)')
+            title=f"{selected_risk_metric} - Performance Trend",
+            xaxis_title="Month",
+            yaxis_title="Score",
+            height=400,
+            showlegend=True
         )
 
         st.plotly_chart(fig_trend, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    with chart_cols[1]:
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-
-        # Enhanced risk heatmap
-        gap_df = pd.DataFrame({
-            'Month': months,
-            'Gap': performance_gaps,
-            'Risk_Level': risk_levels,
-            'Absolute_Gap': [abs(gap) for gap in performance_gaps]
-        })
-
-        fig_risk = px.bar(
-            gap_df,
+    with col2:
+        # Risk level distribution
+        fig_risk_bar = px.bar(
+            trend_df,
             x='Month',
             y='Gap',
             color='Risk_Level',
+            title=f"{selected_risk_metric} - Performance Gap Analysis",
             color_discrete_map={
-                'High Risk': '#dc2626',
-                'Medium Risk': '#f59e0b',
-                'Low Risk': '#10b981'
-            },
-            text='Gap'
+                'High Risk': '#ff4444',
+                'Medium Risk': '#ffaa00',
+                'Low Risk': '#00aa00'
+            }
         )
 
-        fig_risk.add_hline(y=0, line_dash="solid", line_color="#64748b", line_width=2)
-        fig_risk.update_traces(texttemplate='%{text:+.2f}', textposition='outside')
+        fig_risk_bar.add_hline(y=0, line_dash="solid", line_color="black")
+        fig_risk_bar.update_layout(height=400)
+        st.plotly_chart(fig_risk_bar, use_container_width=True)
 
-        fig_risk.update_layout(
-            title=f"🎯 Risk Assessment - {selected_risk_metric}",
-            font=dict(family="Inter", size=12),
-            plot_bgcolor='rgba(248,250,252,0.8)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            height=500,
-            showlegend=True,
-            xaxis=dict(title="📅 Period", gridcolor='rgba(226,232,240,0.8)'),
-            yaxis=dict(title="📈 Gap from Target", gridcolor='rgba(226,232,240,0.8)')
+    # Comparative analysis across all metrics
+    st.subheader("Comparative Risk Analysis - All Metrics")
+
+    # Create comprehensive comparison data
+    all_metrics_data = []
+    for metric, info in risk_metric_options.items():
+        current = info['current_scores'][-1]
+        avg = sum(info['current_scores']) / len(info['current_scores'])
+        gap = info['target'] - current
+        trend = info['current_scores'][-1] - info['current_scores'][0]
+
+        all_metrics_data.append({
+            'Metric': metric,
+            'Current_Score': current,
+            'Average_Score': avg,
+            'Performance_Gap': gap,
+            'Trend_Direction': trend,
+            'Risk_Level': 'High Risk' if gap > 0.5 else 'Medium Risk' if gap > 0.2 else 'Low Risk'
+        })
+
+    comparison_df = pd.DataFrame(all_metrics_data)
+
+    # Comprehensive comparison charts
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Current score comparison
+        fig_comparison = px.bar(
+            comparison_df.sort_values('Current_Score', ascending=True),
+            x='Current_Score',
+            y='Metric',
+            orientation='h',
+            color='Risk_Level',
+            title="Current Performance - All Metrics",
+            color_discrete_map={
+                'High Risk': '#ff4444',
+                'Medium Risk': '#ffaa00',
+                'Low Risk': '#00aa00'
+            }
         )
 
-        st.plotly_chart(fig_risk, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        fig_comparison.add_vline(x=9.0, line_dash="dash", line_color="red", 
+                               annotation_text="Target (9.0)")
+        fig_comparison.update_layout(height=500)
+        st.plotly_chart(fig_comparison, use_container_width=True)
 
-    # Enhanced business intelligence insights
-    st.markdown('<h3 class="subsection-header">💡 Strategic Business Intelligence</h3>', unsafe_allow_html=True)
+    with col2:
+        # Performance gap analysis
+        fig_gaps = px.scatter(
+            comparison_df,
+            x='Performance_Gap',
+            y='Trend_Direction',
+            size='Current_Score',
+            color='Risk_Level',
+            hover_data=['Metric', 'Average_Score'],
+            title="Risk vs Trend Analysis Matrix",
+            color_discrete_map={
+                'High Risk': '#ff4444',
+                'Medium Risk': '#ffaa00',
+                'Low Risk': '#00aa00'
+            }
+        )
 
-    insights_cols = st.columns(2)
+        fig_gaps.add_vline(x=0, line_dash="dash", line_color="gray")
+        fig_gaps.add_hline(y=0, line_dash="dash", line_color="gray")
+        fig_gaps.update_layout(height=500)
+        st.plotly_chart(fig_gaps, use_container_width=True)
 
-    with insights_cols[0]:
-        st.markdown(f"""
-        <div class="metric-card">
-            <h3>🎯 Business Impact Analysis</h3>
-            <div style="margin: 1.5rem 0;">
-                <h4 style="color: #667eea; margin-bottom: 1rem;">📊 Current Situation:</h4>
-                <p style="line-height: 1.8; margin-bottom: 1rem;">{metric_info['business_impact']}</p>
+    # Time series comparison for all metrics
+    st.subheader("Performance Evolution - All Metrics")
 
-                <h4 style="color: #ef4444; margin: 1.5rem 0 1rem 0;">⚠️ Key Risk Factors:</h4>
-                <ul style="margin: 0; padding-left: 1.5rem;">
-        """, unsafe_allow_html=True)
+    # Create time series data for all metrics
+    time_series_data = []
+    for month_idx, month in enumerate(months):
+        for metric, info in risk_metric_options.items():
+            time_series_data.append({
+                'Month': month,
+                'Metric': metric,
+                'Score': info['current_scores'][month_idx],
+                'Target': info['target'],
+                'Gap': info['target'] - info['current_scores'][month_idx]
+            })
 
-        for factor in metric_info['risk_factors']:
-            st.markdown(f"<li style='margin: 0.5rem 0; line-height: 1.6;'>{factor}</li>", unsafe_allow_html=True)
+    time_series_df = pd.DataFrame(time_series_data)
 
-        st.markdown(f"""
-                </ul>
+    # Multi-line chart showing all metrics over time
+    fig_evolution = px.line(
+        time_series_df,
+        x='Month',
+        y='Score',
+        color='Metric',
+        title="Performance Evolution - All Metrics Over Time",
+        markers=True
+    )
 
-                <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
-                            padding: 1rem; border-radius: 8px; margin-top: 1.5rem; border-left: 4px solid #ef4444;">
-                    <strong>💰 Financial Impact:</strong><br>
-                    {metric_info['financial_impact']}
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    fig_evolution.add_hline(y=9.0, line_dash="dash", line_color="red", 
+                          annotation_text="Target (9.0)")
+    fig_evolution.update_layout(height=500)
+    st.plotly_chart(fig_evolution, use_container_width=True)
 
-    with insights_cols[1]:
-        st.markdown(f"""
-        <div class="metric-card status-excellent">
-            <h3>💡 Strategic Recommendations</h3>
-            <div style="margin: 1.5rem 0;">
-                <h4 style="color: #10b981; margin-bottom: 1rem;">🚀 Action Plan:</h4>
-                <ol style="margin: 0; padding-left: 1.5rem;">
-        """, unsafe_allow_html=True)
+    # Detailed metric insights and recommendations
+    st.subheader(f"Business Intelligence Insights: {selected_risk_metric}")
 
+    # Business impact analysis
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        st.markdown("### 🎯 Business Impact Analysis")
+        st.info(f"**Impact**: {metric_info['business_impact']}")
+
+        st.markdown("### ⚠️ Key Risk Factors")
+        for i, factor in enumerate(metric_info['risk_factors'], 1):
+            st.write(f"{i}. {factor}")
+
+    with col2:
+        st.markdown("### 💡 Strategic Recommendations")
         for i, rec in enumerate(metric_info['recommendations'], 1):
-            priority_label = ["🔥 Critical", "⚡ High", "📊 Medium", "📋 Low"][min(i-1, 3)]
-            st.markdown(f"<li style='margin: 0.8rem 0; line-height: 1.6;'><strong>{priority_label}:</strong> {rec}</li>", unsafe_allow_html=True)
+            st.write(f"{i}. {rec}")
 
-        # Performance prediction based on trend
+        # Performance prediction
         if trend_direction > 0.1:
-            prediction = "📈 **Positive Outlook**: Current trends indicate continued improvement in the next quarter"
-            prediction_color = "#10b981"
-            forecast_impact = "Potential 15-25% improvement in business metrics"
+            prediction = "📈 **Positive Outlook**: Current trends suggest continued improvement"
+            prediction_color = "success"
         elif trend_direction < -0.1:
-            prediction = "📉 **Warning Signal**: Declining trend requires immediate strategic intervention"
-            prediction_color = "#ef4444"
-            forecast_impact = "Risk of 10-20% degradation without action"
+            prediction = "📉 **Warning**: Declining trend requires immediate attention"
+            prediction_color = "error"
         else:
-            prediction = "➡️ **Stable Performance**: Maintaining current levels with monitoring recommended"
-            prediction_color = "#667eea"
-            forecast_impact = "Expected stable performance with minor fluctuations"
+            prediction = "➡️ **Stable**: Performance is stable but monitor for changes"
+            prediction_color = "info"
+
+        st.markdown("### 🔮 Performance Outlook")
+        st.markdown(f":{prediction_color}[{prediction}]")
+
+    # Priority action matrix
+    st.subheader("Priority Action Matrix")
+
+    # Create priority matrix based on risk level and trend
+    priority_data = []
+    for metric, info in risk_metric_options.items():
+        current = info['current_scores'][-1]
+        gap = info['target'] - current
+        trend = info['current_scores'][-1] - info['current_scores'][0]
+
+        # Determine priority level
+        if gap > 0.5 and trend < -0.1:
+            priority = "Critical - Immediate Action Required"
+            priority_score = 4
+        elif gap > 0.3 or trend < -0.2:
+            priority = "High - Action Required Soon"
+            priority_score = 3
+        elif gap > 0.1 or trend < -0.1:
+            priority = "Medium - Monitor Closely"
+            priority_score = 2
+        else:
+            priority = "Low - Maintain Current Performance"
+            priority_score = 1
+
+        priority_data.append({
+            'Metric': metric,
+            'Current_Score': current,
+            'Gap': gap,
+            'Trend': trend,
+            'Priority': priority,
+            'Priority_Score': priority_score
+        })
+
+    priority_df = pd.DataFrame(priority_data).sort_values('Priority_Score', ascending=False)
+
+    # Display priority matrix
+    for _, row in priority_df.iterrows():
+        if row['Priority_Score'] == 4:
+            alert_type = "error"
+            icon = "🚨"
+            border_color = "#ff4444"
+        elif row['Priority_Score'] == 3:
+            alert_type = "warning"
+            icon = "⚠️"
+            border_color = "#ffaa00"
+        elif row['Priority_Score'] == 2:
+            alert_type = "info"
+            icon = "ℹ️"
+            border_color = "#3498db"
+        else:
+            alert_type = "success"
+            icon = "✅"
+            border_color = "#00aa00"
 
         st.markdown(f"""
-                </ol>
-
-                <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); 
-                            padding: 1rem; border-radius: 8px; margin-top: 1.5rem; border-left: 4px solid #10b981;">
-                    <h4 style="margin: 0 0 0.8rem 0; color: #065f46;">🔮 {time_horizon} Forecast:</h4>
-                    <p style="color: {prediction_color}; font-weight: 600; margin: 0.5rem 0;">{prediction}</p>
-                    <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #064e3b;">{forecast_impact}</p>
-                </div>
-            </div>
+        <div style="padding: 1rem; margin: 0.5rem 0; border-radius: 8px; border-left: 4px solid {border_color}; background: #f8f9fa;">
+            <h4 style="margin: 0;">{icon} {row['Metric']}</h4>
+            <p><strong>Priority:</strong> {row['Priority']}</p>
+            <p><strong>Current Score:</strong> {row['Current_Score']:.2f} | <strong>Gap:</strong> {row['Gap']:.2f} | <strong>Trend:</strong> {row['Trend']:+.2f}</p>
         </div>
         """, unsafe_allow_html=True)
 
-# Enhanced export functionality with business intelligence
-st.markdown('<div style="margin-top: 4rem;">', unsafe_allow_html=True)
-st.markdown('<h2 class="section-header">📥 Advanced Data Export & Reporting Center</h2>', unsafe_allow_html=True)
+    # Executive summary
+    st.subheader("📊 Executive Summary & Key Takeaways")
 
-export_cols = st.columns(4)
+    # Calculate overall statistics
+    high_risk_count = len([m for m in priority_df['Priority_Score'] if m >= 3])
+    improving_metrics = len([m for m in priority_df['Trend'] if m > 0.1])
+    avg_performance = comparison_df['Current_Score'].mean()
 
-with export_cols[0]:
-    if st.button("📊 Executive Dashboard", key="export_executive", use_container_width=True):
-        st.success("📊 Executive dashboard export initiated!")
-        # Here you would generate an executive summary
+    summary_col1, summary_col2, summary_col3 = st.columns(3)
 
-with export_cols[1]:
-    if st.button("📈 Performance Report", key="export_performance", use_container_width=True):
-        try:
-            csv_buffer = io.StringIO()
-            daily_df.to_csv(csv_buffer, index=False)
-            st.download_button(
-                label="💾 Download Performance CSV",
-                data=csv_buffer.getvalue(),
-                file_name=f"performance_report_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime="text/csv",
-                key="download_performance"
-            )
-            st.success("✅ Performance report ready!")
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+    with summary_col1:
+        st.metric("High Priority Metrics", high_risk_count, delta=f"of {len(priority_df)} total")
 
-with export_cols[2]:
-    if st.button("⚠️ Risk Analysis Report", key="export_risk_analysis", use_container_width=True):
-        try:
-            risk_data = []
-            for metric, info in risk_metric_options.items():
-                current = info['current_scores'][-1]
-                trend = info['current_scores'][-1] - info['current_scores'][0]
-                risk_level = 'High Risk' if (info['target'] - current) > 0.5 else 'Medium Risk' if (info['target'] - current) > 0.2 else 'Low Risk'
+    with summary_col2:
+        st.metric("Improving Metrics", improving_metrics, delta=f"of {len(priority_df)} total")
 
-                risk_data.append({
-                    'Metric': metric,
-                    'Current_Score': current,
-                    'Target_Score': info['target'],
-                    'Gap': info['target'] - current,
-                    'Trend': trend,
-                    'Risk_Level': risk_level,
-                    'Business_Priority': info['business_priority'],
-                    'Financial_Impact': info['financial_impact']
-                })
+    with summary_col3:
+        st.metric("Overall Performance", f"{avg_performance:.2f}", delta=f"{avg_performance-9.0:+.2f}")
 
-            risk_df = pd.DataFrame(risk_data)
-            csv_buffer = io.StringIO()
-            risk_df.to_csv(csv_buffer, index=False)
-            st.download_button(
-                label="💾 Download Risk Analysis CSV",
-                data=csv_buffer.getvalue(),
-                file_name=f"risk_analysis_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime="text/csv",
-                key="download_risk_analysis"
-            )
-            st.success("✅ Risk analysis report ready!")
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+    # Strategic recommendations based on overall analysis
+    st.markdown("### 🎯 Strategic Focus Areas for City Furniture Website")
 
-with export_cols[3]:
-    if st.button("🚨 Critical Events Report", key="export_critical_events", use_container_width=True):
-        try:
-            csv_buffer = io.StringIO()
-            events_df.to_csv(csv_buffer, index=False)
-            st.download_button(
-                label="💾 Download Events CSV",
-                data=csv_buffer.getvalue(),
-                file_name=f"critical_events_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime="text/csv",
-                key="download_critical_events"
-            )
-            st.success("✅ Critical events report ready!")
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+    critical_metrics = priority_df[priority_df['Priority_Score'] >= 3]['Metric'].tolist()
+    if critical_metrics:
+        st.error(f"**🚨 Immediate Action Required:** {', '.join(critical_metrics)}")
+        st.markdown("**Impact:** These metrics require immediate intervention to prevent customer satisfaction decline and potential revenue loss.")
 
-st.markdown('</div>', unsafe_allow_html=True)
+    declining_metrics = priority_df[priority_df['Trend'] < -0.1]['Metric'].tolist()
+    if declining_metrics:
+        st.warning(f"**📉 Declining Performance:** {', '.join(declining_metrics)}")
+        st.markdown("**Impact:** Monitor these metrics closely and implement preventive measures to stop further deterioration.")
 
-# Premium footer with business intelligence branding
-st.markdown("""
-<div style="margin-top: 5rem; padding: 3rem; 
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
-            border-radius: 20px; text-align: center; 
-            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-            border: 1px solid #475569;">
-    <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 1.5rem;">
-        <div style="font-size: 3rem;">🏢</div>
-        <div>
-            <h2 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 700;">
-                City Furniture - Advanced Analytics Intelligence Platform
-            </h2>
-            <p style="color: #cbd5e1; margin: 0.5rem 0 0 0; font-size: 1.1rem;">
-                Last Updated: October 2025 | Powered by Advanced Business Intelligence & AI-Driven Analytics
-            </p>
-        </div>
-    </div>
+    strong_metrics = priority_df[priority_df['Priority_Score'] == 1]['Metric'].tolist()
+    if strong_metrics:
+        st.success(f"**🎉 Strong Performance:** {', '.join(strong_metrics)}")
+        st.markdown("**Impact:** These are competitive advantages to maintain and potentially leverage for marketing positioning.")
 
-    <div style="display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
-        <div style="background: rgba(255,255,255,0.1); padding: 1rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="color: white; font-weight: 600;">🚀 Real-time Analytics</span>
-        </div>
-        <div style="background: rgba(255,255,255,0.1); padding: 1rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="color: white; font-weight: 600;">🤖 AI-Powered Insights</span>
-        </div>
-        <div style="background: rgba(255,255,255,0.1); padding: 1rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="color: white; font-weight: 600;">⚡ Live Business Intelligence</span>
-        </div>
-        <div style="background: rgba(255,255,255,0.1); padding: 1rem 1.5rem; border-radius: 25px; backdrop-filter: blur(10px);">
-            <span style="color: white; font-weight: 600;">🎯 Strategic Decision Support</span>
-        </div>
-    </div>
+    # Final recommendations summary
+    st.markdown("### 📋 Final Recommendations Summary")
+    st.markdown(f"""
+    **For City Furniture's website optimization, focus on:**
 
-    <p style="color: #94a3b8; margin: 0; font-size: 0.9rem; font-style: italic;">
-        Enterprise-grade analytics platform • All features fully integrated and operational<br>
-        Advanced risk management • Predictive business intelligence • Strategic performance optimization
-    </p>
-</div>
-""", unsafe_allow_html=True)
+    1. **Immediate Actions** ({high_risk_count} metrics need attention):
+       - Prioritize user experience improvements in checkout and product information
+       - Implement transparent pricing throughout the customer journey
+       - Enhance mobile responsiveness and site performance
+
+    2. **Performance Monitoring**:
+       - Set up automated alerts for metrics falling below 9.0
+       - Conduct monthly reviews of all satisfaction metrics
+       - Implement A/B testing for continuous improvement
+
+    3. **Long-term Strategy**:
+       - Invest in AI-powered personalization for product recommendations
+       - Develop comprehensive customer feedback collection systems
+       - Create cross-functional teams focused on customer experience optimization
+
+    **Expected ROI:** Improvements in these metrics typically correlate with 10-25% increases in conversion rates and 15-30% reduction in cart abandonment.
+    """)
+
+# Export functionality
+st.sidebar.markdown("---")
+st.sidebar.subheader("📥 Export Data")
+
+if st.sidebar.button("Download Daily Data (CSV)"):
+    csv_buffer = io.StringIO()
+    daily_df.to_csv(csv_buffer, index=False)
+    st.sidebar.download_button(
+        label="Download CSV",
+        data=csv_buffer.getvalue(),
+        file_name=f"daily_satisfaction_data_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
+
+if st.sidebar.button("Download Events Data (CSV)"):
+    csv_buffer = io.StringIO()
+    events_df.to_csv(csv_buffer, index=False)
+    st.sidebar.download_button(
+        label="Download Events CSV",
+        data=csv_buffer.getvalue(),
+        file_name=f"events_analysis_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
+
+if st.sidebar.button("Download Risk Analysis (CSV)"):
+    # Create risk analysis summary for export
+    risk_summary_data = []
+    for metric, info in risk_metric_options.items():
+        current = info['current_scores'][-1]
+        gap = info['target'] - current
+        trend = info['current_scores'][-1] - info['current_scores'][0]
+        risk_level = 'High Risk' if gap > 0.5 else 'Medium Risk' if gap > 0.2 else 'Low Risk'
+
+        risk_summary_data.append({
+            'Metric': metric,
+            'Current_Score': current,
+            'Target_Score': info['target'],
+            'Performance_Gap': gap,
+            'Trend_Direction': trend,
+            'Risk_Level': risk_level,
+            'Business_Impact': info['business_impact']
+        })
+
+    risk_summary_df = pd.DataFrame(risk_summary_data)
+    csv_buffer = io.StringIO()
+    risk_summary_df.to_csv(csv_buffer, index=False)
+    st.sidebar.download_button(
+        label="Download Risk CSV",
+        data=csv_buffer.getvalue(),
+        file_name=f"risk_analysis_summary_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
+
+# Footer
+st.markdown("---")
+st.markdown("*Dashboard last updated: October 2025 | City Furniture Customer Satisfaction Analysis - Ultimate Enhanced Version*")
+st.markdown("*Powered by Advanced Analytics & Business Intelligence*")
